@@ -1,6 +1,6 @@
 {
   "name": "@tilejs/database",
-  "version": "1.2.2",
+  "version": "1.2.1",
   "type": "module",
   "description": "Um mecanismo de armazenamento com validação de esquema e segurança.",
   "author": {
@@ -12,10 +12,7 @@
   "homepage": "https://tile.js.org/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/tilejs-org/tile.git"
-  },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
+    "url": "git+https://github.com/tilejs-org/tile.git"
   },
   "bugs": {
     "url": "https://github.com/tilejs-org/tile/issues"
