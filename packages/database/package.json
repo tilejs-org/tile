@@ -1,6 +1,6 @@
 {
   "name": "@tilejs/database",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "type": "module",
   "description": "Um mecanismo de armazenamento com validação de esquema e segurança.",
   "author": {
