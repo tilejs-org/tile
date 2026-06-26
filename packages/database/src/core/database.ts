@@ -31,7 +31,7 @@ export class Database {
 
   private storage: BsonStorageEngine;
   private logger: Logger;
-  private collections: Map<string, Collection> = new Map();
+  private collections: Map<string, Collection<any>> = new Map();
   private connected = false;
 
   /**
@@ -62,6 +62,7 @@ export class Database {
       storage,
       compression,
     });
+
     this.logger = new Logger(logger);
   }
 
@@ -105,41 +106,49 @@ export class Database {
    * const Users = db.collection("users", userSchema);
    * ```
    */
-  collection<T = any>(name: string, schema: Schema<T>): Collection<T> {
-    if (this.collections.has(name)) {
-      return this.collections.get(name) as Collection<T>;
+  collection<T extends object = Record<string, unknown>>(
+    name: string,
+    schema: Schema<T>,
+  ): Collection<T> {
+    const existing = this.collections.get(name);
+
+    if (existing) {
+      return existing as Collection<T>;
     }
 
     const model = new Model<T>(name, schema, this.storage, this.logger);
-    this.collections.set(name, model as any);
+
+    this.collections.set(name, model);
     this.logger.debug(`Collection "${name}" created`);
 
     return model;
   }
 
   /**
-   * Creates or returns a cached model for a collection.
-   *
-   * @example
-   * ```ts
-   * const Users = db.model("users", userSchema);
-   * ```
+   * Alias for {@link collection}.
    */
-  model<T = any>(name: string, schema: Schema<T>): Collection<T> {
+  model<T extends object = Record<string, unknown>>(
+    name: string,
+    schema: Schema<T>,
+  ): Collection<T> {
     return this.collection(name, schema);
   }
 
   /**
-   * Returns a cached model if it already exists.
+   * Returns a cached collection.
    */
-  getCollection<T = any>(name: string): Collection<T> | undefined {
-    return this.collections.get(name) as Collection<T>;
+  getCollection<T extends object = Record<string, unknown>>(
+    name: string,
+  ): Collection<T> | undefined {
+    return this.collections.get(name) as Collection<T> | undefined;
   }
 
   /**
-   * Returns a cached model if it already exists.
+   * Alias for {@link getCollection}.
    */
-  getModel<T = any>(name: string): Collection<T> | undefined {
+  getModel<T extends object = Record<string, unknown>>(
+    name: string,
+  ): Collection<T> | undefined {
     return this.getCollection(name);
   }
 
@@ -150,20 +159,3 @@ export class Database {
     return this.connected;
   }
 }
-
-/**
- * Main database facade.
- *
- * @example
- * ```ts
- * const db = Tile({
- *   dbName: "app",
- *   logger: { enabled: true },
- * });
- *
- * const Users = db.collection("users", userSchema);
- * ```
- */
-// export function Tile(config: TileConfig = {}): Database {
-//   return new Database(config);
-// }

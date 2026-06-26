@@ -1,14 +1,12 @@
 {
   "name": "@tilejs/root",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "license": "MIT",
   "private": true,
   "scripts": {
-    "start": "bun --filter '*' start",
-    "dev": "bun --filter '*' dev",
     "bench": "bun --filter './benchmarks/*' bench",
-    "build": "bun --filter '*' build",
-    "build:packages": "bun --filter './packages/*' build"
+    "dev": "bun --filter './packages/*' dev",
+    "build": "bun --filter './packages/*' build"
   },
   "devDependencies": {
     "@types/bun": "catalog:",
@@ -25,12 +23,15 @@
     "apps/*",
     "api",
     "benchmarks/*",
+    "examples/*",
     "packages/*",
+    "tools/*",
     "website"
   ],
   "catalog": {
     "@types/node": "^24",
-    "@types/bun": "^1",
+    "@types/bun": "latest",
+    "@tilejs/config": "*",
     "typescript": "^5",
     "tsx": "^4"
   },

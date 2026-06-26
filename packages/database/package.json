@@ -1,18 +1,21 @@
 {
   "name": "@tilejs/database",
-  "version": "1.2.1",
+  "version": "1.2.2",
+  "homepage": "https://tile.js.org/",
+  "license": "MIT",
   "type": "module",
   "description": "Um mecanismo de armazenamento com validação de esquema e segurança.",
+  "publishConfig": {
+    "access": "public"
+  },
   "author": {
     "name": "Israel R. Jatobá",
-    "email": "contact.israeljatoba@gmail.com",
     "url": "https://github.com/yeyTaken"
   },
-  "license": "MIT",
-  "homepage": "https://tile.js.org/",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tilejs-org/tile.git"
+    "url": "https://github.com/tilejs-org/tile",
+    "directory": "packages/database"
   },
   "bugs": {
     "url": "https://github.com/tilejs-org/tile/issues"
@@ -39,21 +42,17 @@
   "files": [
     "dist"
   ],
-  "sideEffects": false,
-  "engines": {
-    "node": ">=20",
-    "bun": ">=1"
-  },
-  "scripts": {
-    "test": "bun ./test/index.ts",
-    "build": "tsc & echo ✔ Ok",
-    "prepublishOnly": "bun run build"
-  },
   "devDependencies": {
-    "@types/node": "catalog:",
+    "@types/bun": "catalog:",
+    "@tilejs/config": "catalog:",
     "typescript": "catalog:"
   },
   "dependencies": {
     "bson": "^7.3.0"
+  },
+  "scripts": {
+    "typegen": "tsc",
+    "build": "bun run ./build.ts",
+    "dev": "bun run ./playground/index.ts"
   }
 }

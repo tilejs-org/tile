@@ -13,13 +13,11 @@ import type {
 } from "./types.js";
 import { ObjectId } from "../storage/bson.js";
 
-export interface Collection<T = any> {
+export interface Collection<T extends object = Record<string, unknown>> {
   readonly schema: Schema<T>;
   describeSchema(): SchemaDescription;
   create(data: T): Promise<T & InternalDocumentFields>;
-  findOne(
-    filter: QueryFilter,
-  ): Promise<(T & InternalDocumentFields) | null>;
+  findOne(filter: QueryFilter): Promise<(T & InternalDocumentFields) | null>;
   find(filter?: QueryFilter): Promise<Array<T & InternalDocumentFields>>;
   findOneByID(id: string): Promise<(T & InternalDocumentFields) | null>;
   findOneById(id: string): Promise<(T & InternalDocumentFields) | null>;
@@ -48,15 +46,8 @@ export interface Collection<T = any> {
  * const user = await Users.create({ name: "Israel" });
  * ```
  */
-export class Model<T = any> implements Collection<T> {
-  /**
-   * The schema bound to this model.
-   *
-   * @example
-   * ```ts
-   * console.log(Users.schema.describe());
-   * ```
-   */
+export class Model<T extends object = Record<string, unknown>>
+  implements Collection<T> {
   public readonly schema: Schema<T>;
   private storage: BsonStorageEngine;
   private logger: Logger;
@@ -64,9 +55,6 @@ export class Model<T = any> implements Collection<T> {
   private uniqueFields: Set<string> = new Set();
   private ready: Promise<void>;
 
-  /**
-   * Creates a model bound to one collection.
-   */
   constructor(
     name: string,
     schema: Schema<T>,
@@ -81,7 +69,9 @@ export class Model<T = any> implements Collection<T> {
     this.ready = this.storage.prepareCollection(
       this.name,
       Array.from(this.uniqueFields),
-    ).then(() => this.storage.writeCollectionSchema(this.name, this.schema.describe()));
+    ).then(() =>
+      this.storage.writeCollectionSchema(this.name, this.schema.describe()),
+    );
   }
 
   private identifyUniqueFields(): void {

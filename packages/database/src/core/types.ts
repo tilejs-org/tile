@@ -17,6 +17,32 @@ export type FieldType =
   | "Array"
   | "Object";
 
+export type SchemaDefinition<T extends object> = {
+  [K in keyof T]?:
+    | FieldDefinition
+    | FieldType
+    | typeof String
+    | typeof Number
+    | typeof Boolean
+    | typeof Date;
+} & {
+  _id?:
+    | FieldDefinition
+    | FieldType
+    | typeof String
+    | typeof Number
+    | typeof Boolean
+    | typeof Date;
+
+  __v?:
+    | FieldDefinition
+    | FieldType
+    | typeof String
+    | typeof Number
+    | typeof Boolean
+    | typeof Date;
+};
+
 /**
  * Describes a field in a schema definition.
  *

@@ -1,7 +1,7 @@
 import type {
   FieldDefinition,
   FieldType,
-  ValidatorFunction,
+  // ValidatorFunction,
 } from "../core/types.js";
 
 /**
@@ -142,7 +142,7 @@ export class Validator {
   static processValue(
     value: any,
     fieldDef: FieldDefinition,
-    fieldName: string,
+    __fieldName: string,
   ): any {
     if (value === undefined || value === null) {
       if (fieldDef.default !== undefined) {

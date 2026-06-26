@@ -1,6 +1,7 @@
 import type {
   FieldDefinition,
   FieldType,
+  SchemaDefinition,
   SchemaDescription,
   SchemaFieldDescription,
   SchemaOptions,
@@ -24,7 +25,7 @@ import type {
  * );
  * ```
  */
-export class Schema<T = any> {
+export class Schema<T extends object = Record<string, unknown>> {
   private fields: Record<string, FieldDefinition> = {};
   private options: SchemaOptions;
 
@@ -34,18 +35,7 @@ export class Schema<T = any> {
    * @param definition - Field configuration or shorthand constructors.
    * @param options - Schema-level options such as timestamps.
    */
-  constructor(
-    definition: Record<
-      string,
-      | FieldDefinition
-      | FieldType
-      | typeof String
-      | typeof Number
-      | typeof Boolean
-      | typeof Date
-    >,
-    options?: SchemaOptions,
-  ) {
+  constructor(definition: SchemaDefinition<T>, options?: SchemaOptions) {
     this.options = options || {};
     this.parseDefinition(definition);
     this.ensureInternalFields();
@@ -190,7 +180,9 @@ export class Schema<T = any> {
     const addFieldDescription = (
       name: string,
       field: FieldDefinition,
-      overrides?: Partial<Pick<SchemaFieldDescription, "unique" | "auto" | "required">>,
+      overrides?: Partial<
+        Pick<SchemaFieldDescription, "unique" | "auto" | "required">
+      >,
     ): void => {
       fields[name] = {
         name,

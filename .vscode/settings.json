@@ -1,0 +1,12 @@
+{
+    "catppuccin-icons.associations.folders": {
+        // packages:
+        "@config": "folder_config",
+        "@template": "folder_templates",
+
+        // tile:
+        ".tile": "folder_config",
+
+        "changelog": "git"
+    }
+}

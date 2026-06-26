@@ -1,4 +1,8 @@
-import { deserialize, ObjectId, serialize } from "./bson.js";
+import {
+  deserialize,
+  // ObjectId,
+  serialize
+} from "./bson.js";
 import { gunzipSync, gzipSync } from "node:zlib";
 import {
   mkdir,
