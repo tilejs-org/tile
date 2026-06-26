@@ -1,0 +1,154 @@
+---
+title: Instalação
+description: Instale o TileJS Database no seu projeto
+icon: Download
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import { File, Folder, Files } from "fumadocs-ui/components/files";
+
+# Instalação
+
+O **@tilejs/database** pode ser instalado utilizando qualquer gerenciador de pacotes compatível com o Node.js ou Bun.
+
+<Callout type="info">
+É recomendado utilizar a versão mais recente do pacote para aproveitar novos recursos e correções.
+</Callout>
+
+---
+
+## Instale o pacote
+
+<Tabs items={["bun", "npm", "pnpm", "yarn"]} >
+
+<Tab value="bun">
+
+```bash
+bun add @tilejs/database
+```
+
+</Tab>
+
+<Tab value="npm">
+
+```bash
+npm install @tilejs/database
+```
+
+</Tab>
+
+<Tab value="pnpm">
+
+```bash
+pnpm add @tilejs/database
+```
+
+</Tab>
+
+<Tab value="yarn">
+
+```bash
+yarn add @tilejs/database
+```
+
+</Tab>
+
+</Tabs>
+
+---
+
+## Requisitos
+
+| Requisito | Versão |
+| ---------- | ------ |
+| Node.js | >= 24.x |
+| Bun | >= 1.x |
+| TypeScript | >= 5.x |
+
+---
+
+## Verificando a instalação
+
+Crie um arquivo chamado `index.ts` e importe o pacote:
+
+```ts title="index.ts"
+import { Database, Schema } from "@tilejs/database";
+
+console.log("TileJS Database instalado com sucesso!");
+```
+
+Execute:
+
+<Tabs items={["bun", "node"]}>
+
+<Tab value="bun">
+
+```bash
+bun index.ts
+```
+
+</Tab>
+
+<Tab value="node">
+
+```bash
+node index.ts
+```
+
+</Tab>
+
+</Tabs>
+
+Se nenhuma mensagem de erro aparecer, a instalação foi concluída corretamente.
+
+---
+
+## Estrutura do projeto
+
+Antes da primeira execução:
+
+<Files>
+  <Folder name="src" defaultOpen>
+    <File name="index.ts" />
+  </Folder>
+
+  <File name="package.json" />
+  <File name="tsconfig.json" />
+</Files>
+
+Após criar sua primeira `Database`, a pasta `.tile` será criada automaticamente.
+
+---
+
+## O que é criado?
+
+Na primeira vez que uma coleção é criada, o TileJS gera automaticamente toda a estrutura necessária para armazenar os dados.
+
+Isso inclui:
+
+- A pasta `.tile`
+- A database
+- As collections
+- Os arquivos de schema
+- Os índices únicos (`unique`)
+
+Você não precisa criar nenhum desses arquivos manualmente.
+
+<Callout type="tip">
+O TileJS utiliza arquivos **BSON** para armazenar documentos e arquivos **JSON** para metadados e índices, permitindo um banco de dados leve e portátil.
+</Callout>
+
+---
+
+## Próximo passo
+
+Agora que o pacote está instalado, o próximo passo é criar sua primeira conexão com a database.
+
+<Cards>
+  <Card
+    title="Criando uma Database"
+    href="/docs/database/database"
+  >
+    Aprenda como configurar e inicializar sua primeira database.
+  </Card>
+</Cards>

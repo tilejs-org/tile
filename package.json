@@ -1,0 +1,40 @@
+{
+  "name": "@tilejs/root",
+  "version": "0.1.0",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "bun --filter '*' start",
+    "dev": "bun --filter '*' dev",
+    "bench": "bun --filter './benchmarks/*' bench",
+    "build": "bun --filter '*' build",
+    "build:packages": "bun --filter './packages/*' build"
+  },
+  "devDependencies": {
+    "@types/bun": "catalog:",
+    "@types/node": "catalog:",
+    "typescript": "catalog:"
+  },
+  "author": {
+    "name": "Israel R. Jatobá",
+    "organization": "Israel R. Jatobá, Inc.",
+    "email": "contact.israeljatoba@gmail.com",
+    "github": "https://github.com/yeyTaken"
+  },
+  "workspaces": [
+    "apps/*",
+    "api",
+    "benchmarks/*",
+    "packages/*",
+    "website"
+  ],
+  "catalog": {
+    "@types/node": "^24",
+    "@types/bun": "^1",
+    "typescript": "^5",
+    "tsx": "^4"
+  },
+  "engines": {
+    "bun": ">=1"
+  }
+}

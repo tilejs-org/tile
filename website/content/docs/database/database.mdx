@@ -1,0 +1,205 @@
+---
+title: Database
+description: Crie e configure sua primeira Database
+icon: Database
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+import { File, Folder, Files } from "fumadocs-ui/components/files";
+import { DatabaseIcon, TableProperties } from "lucide-react";
+
+# Database
+
+A classe `Database` é responsável por criar e gerenciar uma database do TileJS.
+
+Ela define onde os arquivos serão armazenados, o nome da database, o comportamento do logger e outras configurações globais.
+
+---
+
+## Criando uma Database
+
+A forma mais simples de criar uma database é utilizando todas as configurações padrão.
+
+```ts title="src/index.ts"
+import { Database } from "@tilejs/database";
+
+const database = new Database();
+```
+
+Por padrão, será criada uma database chamada **test**, armazenada em:
+
+```text
+.tile/database/test
+```
+
+---
+
+## Configuração completa
+
+Todas as opções podem ser personalizadas.
+
+```ts title="src/index.ts"
+import { Database } from "@tilejs/database";
+
+const database = new Database({
+  dbName: "my-database",
+
+  storage: "workspace",
+
+  compression: false,
+
+  logger: {
+    enabled: true,
+    colors: true,
+  },
+});
+```
+
+---
+
+## Opções
+
+<TypeTable
+  type={{
+    dbName: {
+      description: "Nome da database.",
+      type: "string",
+      default: '"test"',
+    },
+    storage: {
+      description: "Local onde os arquivos serão armazenados.",
+      type: '"workspace" | "global"',
+      default: '"workspace"',
+    },
+    logger: {
+      description: "Configuração do logger.",
+      type: "LoggerConfig",
+      default: "{ enabled: false, colors: false }",
+    },
+    compression: {
+      description: "Compacta os arquivos BSON utilizando Gzip.",
+      type: "boolean",
+      default: "false",
+    },
+  }}
+/>
+
+---
+
+## Modos de armazenamento
+
+### Workspace
+
+Salva os dados dentro do projeto.
+
+```text
+.tile/
+└── database/
+    └── test/
+```
+
+Ideal para aplicações, APIs e projetos que mantêm seus dados junto ao código-fonte.
+
+---
+
+### Global
+
+Salva os dados no diretório do usuário.
+
+```text
+~/.tile/
+└── database/
+    └── test/
+```
+
+Esse modo é recomendado para CLIs e ferramentas utilizadas em diversos projetos.
+
+---
+
+## Logger
+
+O logger facilita o desenvolvimento exibindo informações importantes durante a execução.
+
+```ts
+import { Database } from "@tilejs/database";
+
+const database = new Database({
+  logger: {
+    enabled: true,
+    colors: true,
+  },
+});
+```
+
+Saída:
+
+```bash
+[DEBUG] Database initialized
+[DEBUG] Collection "users" created
+```
+
+---
+
+## Estrutura criada
+
+A Database cria automaticamente toda a estrutura necessária.
+
+<Files>
+  <Folder name=".tile">
+    <Folder name="database" defaultOpen>
+      <Folder name="my-database" defaultOpen />
+    </Folder>
+  </Folder>
+</Files>
+
+Você não precisa criar nenhuma pasta manualmente.
+
+---
+
+## Responsabilidades da Database
+
+<Cards cols={2}>
+  <Card
+    icon={<DatabaseIcon />}
+    title="Gerenciar Collections"
+  >
+    Todas as collections pertencem a uma Database.
+  </Card>
+
+  <Card
+    icon={<DatabaseIcon />}
+    title="Armazenamento"
+  >
+    Define onde os arquivos da database serão salvos.
+  </Card>
+
+  <Card
+    icon={<DatabaseIcon />}
+    title="Logger"
+  >
+    Centraliza toda a configuração de logs.
+  </Card>
+
+  <Card
+    icon={<DatabaseIcon />}
+    title="Inicialização"
+  >
+    Cria automaticamente a estrutura necessária para funcionamento.
+  </Card>
+</Cards>
+
+---
+
+## Próximo passo
+
+Agora que a Database foi criada, o próximo passo é definir a estrutura dos documentos utilizando um Schema.
+
+<Cards>
+  <Card
+    icon={<TableProperties />}
+    title="Schema"
+    href="/docs/database/schema"
+  >
+    Aprenda a criar schemas, definir tipos, índices e validações.
+  </Card>
+</Cards>

@@ -1,0 +1,31 @@
+{
+  "name": "@tilejs/api",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "bun --watch --env-file=.env.development.local src/server.ts",
+    "build": "tsc",
+    "start": "NODE_ENV=production node --env-file=.env.local dist/server.js"
+  },
+  "author": {
+    "name": "Israel R. Jatobá",
+    "email": "contact.israeljatoba@gmail.com",
+    "url": "https://github.com/yeyTaken"
+  },
+  "dependencies": {
+    "@elysia/node": "^1.4.6",
+    "@elysiajs/cors": "^1.4.1",
+    "@elysiajs/openapi": "^1.4.13",
+    "argon2": "^0.44.0",
+    "axios": "^1.18.1",
+    "better-auth": "^1.4.12",
+    "chalk": "^5.6.2",
+    "elysia": "latest",
+    "pino": "^10.1.1",
+    "zod": "^4.3.5"
+  },
+  "devDependencies": {
+    "@types/node": "^24",
+    "typescript": "^5"
+  }
+}

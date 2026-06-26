@@ -1,0 +1,12 @@
+{
+  "title": "NPM",
+  "description": "The default Node Packages Manager",
+  "icon": "PanelsTopLeft",
+  "root": true,
+  "pages": [
+    "---Introdução---",
+    "index",
+    "---@tilejs/---",
+    "..."
+  ]
+}

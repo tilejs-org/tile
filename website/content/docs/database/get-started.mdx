@@ -1,0 +1,241 @@
+---
+title: Iniciando
+description: Visão geral e primeiros passos com o TileJS Database
+icon: Rocket
+---
+
+import { File, Folder, Files } from "fumadocs-ui/components/files";
+import { TypeTable } from "fumadocs-ui/components/type-table";
+import { RocketIcon, DatabaseIcon, BoxesIcon, FileCodeIcon } from "lucide-react";
+
+# Bem-vindo
+
+O **@tilejs/database** é um banco de dados local, tipado e baseado em schemas para aplicações Node.js e Bun.
+
+Ele foi desenvolvido para oferecer uma API simples, forte integração com TypeScript e armazenamento em arquivos BSON, sem depender de um servidor externo.
+
+<Callout type="info">
+Se esta é sua primeira vez utilizando o TileJS Database, siga esta ordem de leitura:
+
+**Instalação → Database → Schema → Collections → CRUD**
+</Callout>
+
+---
+
+## Principais recursos
+
+<Cards cols={2}>
+  <Card title="100% TypeScript">
+    Schemas totalmente tipados com autocompletar.
+  </Card>
+
+  <Card title="Sem servidor">
+    Armazena todos os dados localmente em arquivos BSON.
+  </Card>
+
+  <Card title="Schemas">
+    Validação, índices e configurações em um único lugar.
+  </Card>
+
+  <Card title="Leve">
+    Ideal para CLIs, bots, APIs e aplicações locais.
+  </Card>
+</Cards>
+
+---
+
+## Exemplo rápido
+
+```ts title="src/index.ts"
+import { Database, Schema } from "@tilejs/database";
+
+interface Member {
+  _id?: string;
+  email: string;
+}
+
+const memberSchema = new Schema<Member>({
+  _id: { type: String },
+  email: { type: String, unique: true },
+});
+
+const connection = new Database({
+  logger: {
+    enabled: true,
+    colors: true,
+  },
+});
+
+const database = Object.assign(connection, {
+  members: connection.collection<Member>("members", memberSchema),
+});
+
+console.log(database.members.describeSchema());
+```
+
+<Callout type="tip">
+Na primeira execução, o banco cria automaticamente a estrutura de diretórios, os índices e o schema da coleção.
+</Callout>
+
+---
+
+## Configuração do Database
+
+<TypeTable
+  type={{
+    dbName: {
+      description: "Nome da database.",
+      type: "string",
+      default: '"test"',
+    },
+    storage: {
+      description: "Define onde os arquivos serão armazenados.",
+      type: '"workspace" | "global"',
+      default: '"workspace"',
+    },
+    logger: {
+      description: "Habilita logs no terminal.",
+      type: "LoggerConfig",
+      default: "{ enabled: false, colors: false }",
+    },
+    compression: {
+      description: "Compacta os arquivos BSON utilizando Gzip.",
+      type: "boolean",
+      default: "false",
+    },
+  }}
+/>
+
+---
+
+## Estrutura criada
+
+Após criar a primeira coleção, a estrutura do projeto ficará semelhante a esta:
+
+<Files>
+  <Folder name=".tile">
+    <Folder name="database" defaultOpen>
+      <Folder name="test" defaultOpen>
+        <Folder name="members" defaultOpen>
+          <File name="_collection_index_id.json" />
+          <File name="_collection_index_email.json" />
+          <File name="_schema.json" />
+        </Folder>
+      </Folder>
+    </Folder>
+  </Folder>
+
+  <Folder name="src" defaultOpen>
+    <File name="index.ts" />
+  </Folder>
+
+  <File name="package.json" />
+  <File name="tsconfig.json" />
+</Files>
+
+<Callout type="info">
+A pasta <code>.tile</code> contém todos os arquivos da database e é criada automaticamente. Não é necessário criar ou editar esses arquivos manualmente.
+</Callout>
+
+---
+
+## Como funcionam os índices
+
+Sempre que um campo do schema possuir `unique: true`, o TileJS cria automaticamente um arquivo de índice exclusivo para esse campo.
+
+Esses índices permitem localizar registros rapidamente e garantem que valores únicos nunca sejam duplicados.
+
+No exemplo acima, o schema foi definido assim:
+
+```ts
+const memberSchema = new Schema<Member>({
+  _id: { type: String },
+  email: { type: String, unique: true },
+});
+```
+
+Por isso, foram criados os arquivos:
+
+- `_collection_index_id.json`
+- `_collection_index_email.json`
+
+### Índice do `_id`
+
+Todo documento possui um `_id` único. O arquivo abaixo registra apenas a existência de cada identificador.
+
+```json title=".tile/database/test/members/_collection_index_id.json"
+{
+  "6a3deee44f73903377c3cf0f": true
+}
+```
+
+### Índice do `email`
+
+Como `email` foi definido com `unique: true`, o índice armazena a relação entre o e-mail e o `_id` do documento.
+
+```json title=".tile/database/test/members/_collection_index_email.json"
+{
+  "israel@gmail.com": "6a3deee44f73903377c3cf0f"
+}
+```
+
+<Callout type="tip">
+Qualquer campo marcado com <code>unique: true</code> gera automaticamente um arquivo chamado <code>_collection_index_&lt;nome-do-campo&gt;.json</code>.
+
+Isso permite que o TileJS verifique rapidamente se um valor já existe antes de inserir ou atualizar um documento, além de acelerar consultas por campos únicos.
+</Callout>
+
+---
+
+## Saída esperada
+
+```bash title="terminal"
+[2026-06-25T01:40:10.097Z] [DEBUG] Collection "members" created
+
+schema: {
+  fields: {
+    _id: { ... },
+    email: { ... },
+    __v: { ... }
+  },
+  timestamps: true
+}
+```
+
+---
+
+## Próximos passos
+
+<Cards>
+  <Card
+    icon={<RocketIcon />}
+    title="Instalação"
+    href="/docs/database/installation"
+  >
+    Aprenda como instalar o TileJS Database.
+  </Card>
+
+  <Card
+    icon={<DatabaseIcon />}
+    title="Database"
+    href="/docs/database/database"
+  >
+    Configure sua primeira database.
+  </Card>
+
+  <Card
+    icon={<BoxesIcon />}
+    title="Schema"
+    href="/docs/database/schema"
+  >
+    Defina campos, validações e índices.
+  </Card>
+
+  <Card
+    icon={<FileCodeIcon />}
+    title="CRUD"
+    href="/docs/database/crud"
+  >
+    Insira, consulte, atualize e remova documentos.
+  </Card>
+</Cards>

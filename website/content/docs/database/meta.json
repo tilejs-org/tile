@@ -1,0 +1,11 @@
+{
+  "title": "Database",
+  "pages": [
+    "get-started",
+    "installation",
+    "database",
+    "schema",
+    "collections",
+    "crud"
+  ]
+}

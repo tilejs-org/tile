@@ -1,0 +1,384 @@
+---
+title: CRUD
+description: Operações de criação, consulta, atualização e remoção de documentos
+icon: SquarePen
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+import { SquarePen } from "lucide-react";
+
+# CRUD
+
+Após criar uma Collection, você pode começar a inserir, consultar, atualizar e remover documentos.
+
+Todos os métodos são assíncronos e retornam uma `Promise`.
+
+---
+
+## Documento de exemplo
+
+Nos exemplos desta página será utilizada a seguinte Collection.
+
+```ts title="database.ts"
+import { Database, Schema } from "@tilejs/database";
+
+interface Member {
+  _id?: string;
+  name: string;
+  email: string;
+  age?: number;
+  verified?: boolean;
+}
+
+const memberSchema = new Schema<Member>({
+  name: {
+    type: String,
+    required: true,
+  },
+
+  email: {
+    type: String,
+    unique: true,
+  },
+
+  age: Number,
+
+  verified: {
+    type: Boolean,
+    default: false,
+  },
+});
+
+const connection = new Database();
+
+export const database = Object.assign(connection, {
+  members: connection.collection<Member>("members", memberSchema),
+});
+```
+
+---
+
+# Inserindo documentos
+
+## insertOne()
+
+Insere um único documento.
+
+```ts
+const member = await database.members.insertOne({
+  name: "Israel",
+  email: "israel@gmail.com",
+  age: 21,
+});
+
+console.log(member);
+```
+
+Retorno:
+
+```ts
+{
+  _id: "68526dba05db8ec36dcb33d8",
+  name: "Israel",
+  email: "israel@gmail.com",
+  age: 21,
+  verified: false,
+  __v: 0,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+---
+
+# Buscando documentos
+
+## findOne()
+
+Retorna o primeiro documento encontrado.
+
+```ts
+const member = await database.members.findOne({
+  email: "israel@gmail.com",
+});
+```
+
+---
+
+## find()
+
+Retorna todos os documentos que correspondem ao filtro.
+
+```ts
+const members = await database.members.find({
+  verified: true,
+});
+```
+
+Também é possível buscar todos os documentos.
+
+```ts
+const members = await database.members.find();
+```
+
+---
+
+## exists()
+
+Verifica se um documento existe.
+
+```ts
+const exists = await database.members.exists({
+  email: "israel@gmail.com",
+});
+```
+
+Retorno:
+
+```ts
+true
+```
+
+---
+
+## countDocuments()
+
+Conta quantos documentos existem na Collection.
+
+```ts
+const total = await database.members.countDocuments();
+```
+
+---
+
+# Atualizando documentos
+
+## updateOne()
+
+Atualiza o primeiro documento encontrado.
+
+```ts
+await database.members.updateOne(
+  {
+    email: "israel@gmail.com",
+  },
+  {
+    verified: true,
+  }
+);
+```
+
+Também é possível utilizar operadores.
+
+```ts
+await database.members.updateOne(
+  {
+    email: "israel@gmail.com",
+  },
+  {
+    $set: {
+      verified: true,
+    },
+
+    $inc: {
+      age: 1,
+    },
+
+    $unset: ["note"],
+  }
+);
+```
+
+---
+
+## Operadores suportados
+
+<TypeTable
+  type={{
+    $set: {
+      description: "Define novos valores.",
+      type: "Record<string, any>",
+    },
+    $inc: {
+      description: "Incrementa campos numéricos.",
+      type: "Record<string, number>",
+    },
+    $unset: {
+      description: "Remove um ou mais campos.",
+      type: "string[] | Record<string, boolean>",
+    },
+    $delete: {
+      description: "Alias para $unset.",
+      type: "string[] | Record<string, boolean>",
+    },
+  }}
+/>
+
+---
+
+# Removendo documentos
+
+## deleteOne()
+
+Remove o primeiro documento encontrado.
+
+```ts
+await database.members.deleteOne({
+  email: "israel@gmail.com",
+});
+```
+
+---
+
+## deleteMany()
+
+Remove vários documentos.
+
+```ts
+await database.members.deleteMany({
+  verified: false,
+});
+```
+
+Remover todos.
+
+```ts
+await database.members.deleteMany();
+```
+
+---
+
+# Paginação
+
+## paginate()
+
+Retorna documentos paginados.
+
+```ts
+const result = await database.members.paginate({
+  page: 1,
+  limit: 10,
+});
+```
+
+Também é possível ordenar.
+
+```ts
+const result = await database.members.paginate({
+  page: 1,
+  limit: 10,
+
+  sort: {
+    createdAt: "desc",
+  },
+});
+```
+
+Retorno:
+
+```ts
+{
+  items: [...],
+  total: 53,
+  page: 1,
+  limit: 10,
+  pages: 6
+}
+```
+
+---
+
+# Descrevendo o Schema
+
+A Collection pode retornar informações do Schema.
+
+```ts
+console.log(database.members.describeSchema());
+```
+
+Resultado:
+
+```ts
+{
+  fields: {
+    _id: {...},
+    name: {...},
+    email: {...},
+    age: {...},
+    verified: {...},
+    __v: {...}
+  },
+
+  timestamps: true,
+
+  collection: undefined
+}
+```
+
+---
+
+# Resumo dos métodos
+
+<TypeTable
+  type={{
+    insertOne: {
+      description: "Insere um documento.",
+      type: "Promise<T>",
+    },
+
+    findOne: {
+      description: "Busca um documento.",
+      type: "Promise<T | null>",
+    },
+
+    find: {
+      description: "Busca vários documentos.",
+      type: "Promise<T[]>",
+    },
+
+    exists: {
+      description: "Verifica existência.",
+      type: "Promise<boolean>",
+    },
+
+    countDocuments: {
+      description: "Conta documentos.",
+      type: "Promise<number>",
+    },
+
+    updateOne: {
+      description: "Atualiza um documento.",
+      type: "Promise<boolean>",
+    },
+
+    deleteOne: {
+      description: "Remove um documento.",
+      type: "Promise<boolean>",
+    },
+
+    deleteMany: {
+      description: "Remove vários documentos.",
+      type: "Promise<number>",
+    },
+
+    paginate: {
+      description: "Retorna documentos paginados.",
+      type: "Promise<PaginateResult<T>>",
+    },
+
+    describeSchema: {
+      description: "Retorna informações do Schema.",
+      type: "SchemaDescription",
+    },
+  }}
+/>
+
+---
+
+## Próximos passos
+
+Agora você já conhece todas as operações básicas disponíveis no TileJS Database.
+
+<Callout type="tip">
+Consulte a documentação do <code>Schema</code> para conhecer todas as validações, índices e opções disponíveis para os campos.
+</Callout>

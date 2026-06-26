@@ -1,0 +1,15 @@
+src
+tsconfig.json
+
+.gitignore
+.npmignore
+
+.vscode
+.idea
+
+node_modules
+
+*.log
+coverage
+
+.github

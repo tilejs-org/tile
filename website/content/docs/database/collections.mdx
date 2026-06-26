@@ -1,0 +1,275 @@
+---
+title: Collections
+description: Crie e gerencie Collections utilizando Schemas
+icon: Table
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+import { File, Folder, Files } from "fumadocs-ui/components/files";
+import { Table } from "lucide-react";
+
+# Collections
+
+Uma **Collection** é onde os documentos são armazenados.
+
+Toda Collection pertence a uma `Database` e utiliza um `Schema` para validar os dados inseridos.
+
+<Callout type="info">
+Uma Collection é semelhante a uma tabela em bancos de dados relacionais, porém armazena documentos em vez de linhas.
+</Callout>
+
+---
+
+## Criando uma Collection
+
+Primeiro crie um Schema.
+
+```ts title="schema.ts"
+import { Schema } from "@tilejs/database";
+
+interface Member {
+  _id?: string;
+  name: string;
+  email: string;
+}
+
+export const memberSchema = new Schema<Member>({
+  name: {
+    type: String,
+    required: true,
+  },
+
+  email: {
+    type: String,
+    unique: true,
+  },
+});
+```
+
+Depois registre a Collection na Database.
+
+```ts title="database.ts"
+import { Database } from "@tilejs/database";
+import { memberSchema } from "./schema";
+
+const connection = new Database();
+
+export const database = Object.assign(connection, {
+  members: connection.collection<Member>("members", memberSchema),
+});
+```
+
+Agora a Collection poderá ser utilizada normalmente.
+
+---
+
+## Estrutura criada
+
+Na primeira execução o TileJS cria automaticamente todos os arquivos necessários.
+
+<Files>
+  <Folder name=".tile">
+    <Folder name="database">
+      <Folder name="test">
+        <Folder name="members" defaultOpen>
+          <File name="_schema.json" />
+          <File name="_collection_index_id.json" />
+          <File name="_collection_index_email.json" />
+          <File name="*.bson" />
+        </Folder>
+      </Folder>
+    </Folder>
+  </Folder>
+</Files>
+
+---
+
+## O que cada arquivo faz?
+
+| Arquivo | Descrição |
+| ------- | --------- |
+| `_schema.json` | Descrição completa do Schema. |
+| `_collection_index_id.json` | Índice do campo `_id`. |
+| `_collection_index_<campo>.json` | Índice de qualquer campo marcado com `unique: true`. |
+| `*.bson` | Documentos armazenados pela Collection. |
+
+---
+
+## Métodos disponíveis
+
+Após criar uma Collection você terá acesso aos principais métodos.
+
+<TypeTable
+  type={{
+    insertOne: {
+      description: "Insere um documento.",
+      type: "(document) => Promise<T>",
+    },
+    findOne: {
+      description: "Busca o primeiro documento correspondente.",
+      type: "(filter) => Promise<T | null>",
+    },
+    find: {
+      description: "Retorna vários documentos.",
+      type: "(filter?) => Promise<T[]>",
+    },
+    updateOne: {
+      description: "Atualiza um documento.",
+      type: "(filter, update) => Promise<boolean>",
+    },
+    deleteOne: {
+      description: "Remove um documento.",
+      type: "(filter) => Promise<boolean>",
+    },
+    deleteMany: {
+      description: "Remove vários documentos.",
+      type: "(filter?) => Promise<number>",
+    },
+    countDocuments: {
+      description: "Conta documentos da Collection.",
+      type: "() => Promise<number>",
+    },
+    exists: {
+      description: "Verifica se um documento existe.",
+      type: "(filter) => Promise<boolean>",
+    },
+    paginate: {
+      description: "Retorna documentos paginados.",
+      type: "(options) => Promise<PaginateResult<T>>",
+    },
+    describeSchema: {
+      description: "Retorna informações do Schema da Collection.",
+      type: "() => SchemaDescription",
+    },
+  }}
+/>
+
+---
+
+## Exemplo
+
+```ts
+const member = await database.members.insertOne({
+  name: "Israel",
+  email: "israel@gmail.com",
+});
+
+console.log(member);
+```
+
+Buscar um documento.
+
+```ts
+const member = await database.members.findOne({
+  email: "israel@gmail.com",
+});
+```
+
+Atualizar.
+
+```ts
+await database.members.updateOne(
+  {
+    email: "israel@gmail.com",
+  },
+  {
+    name: "Israel Rabbi",
+  }
+);
+```
+
+Remover.
+
+```ts
+await database.members.deleteOne({
+  email: "israel@gmail.com",
+});
+```
+
+---
+
+## Índices
+
+Sempre que um campo possuir `unique: true`, a Collection criará automaticamente um índice.
+
+```ts
+const schema = new Schema({
+  email: {
+    type: String,
+    unique: true,
+  },
+});
+```
+
+Será criado:
+
+```text
+_collection_index_email.json
+```
+
+Exemplo:
+
+```json
+{
+  "israel@gmail.com": "6a3deee44f73903377c3cf0f"
+}
+```
+
+Esses índices permitem localizar documentos rapidamente e impedir valores duplicados.
+
+---
+
+## Descrevendo o Schema
+
+A Collection possui acesso direto às informações do Schema.
+
+```ts
+console.log(database.members.describeSchema());
+```
+
+Resultado:
+
+```ts
+{
+  fields: {
+    _id: {...},
+    name: {...},
+    email: {...},
+    __v: {...}
+  },
+  timestamps: true,
+  collection: undefined
+}
+```
+
+---
+
+## Organização recomendada
+
+```text
+src/
+├── database.ts
+├── schemas/
+│   └── member.ts
+├── collections/
+│   └── member.ts
+└── index.ts
+```
+
+Separar Schemas e Collections facilita a manutenção conforme o projeto cresce.
+
+---
+
+## Próximo passo
+
+Agora que sua Collection está criada, você pode começar a inserir, consultar, atualizar e remover documentos.
+
+<Cards>
+  <Card
+    icon={<Table />}
+    title="CRUD"
+    href="/docs/database/crud"
+  >
+    Aprenda todas as operações disponíveis da Collection.
+  </Card>
+</Cards>

@@ -1,0 +1,59 @@
+{
+  "name": "@tilejs/database",
+  "version": "1.2.0",
+  "type": "module",
+  "description": "Um mecanismo de armazenamento com validação de esquema e segurança.",
+  "author": {
+    "name": "Israel R. Jatobá",
+    "email": "contact.israeljatoba@gmail.com",
+    "url": "https://github.com/yeyTaken"
+  },
+  "license": "MIT",
+  "homepage": "https://tile.js.org/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tilejs-org/tile.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tilejs-org/tile/issues"
+  },
+  "keywords": [
+    "database",
+    "bson",
+    "bun",
+    "nodejs",
+    "typescript",
+    "embedded-database",
+    "local-database",
+    "document-database"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=20",
+    "bun": ">=1"
+  },
+  "scripts": {
+    "test": "bun ./test/index.ts",
+    "build": "tsc & echo ✔ Ok",
+    "prepublishOnly": "bun run build"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "typescript": "catalog:"
+  },
+  "dependencies": {
+    "bson": "^7.3.0"
+  }
+}

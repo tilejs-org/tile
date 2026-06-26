@@ -1,0 +1,239 @@
+---
+title: Schema
+description: Defina a estrutura e as regras dos documentos
+icon: TableProperties
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+import { File, Folder, Files } from "fumadocs-ui/components/files";
+import { TableProperties } from "lucide-react";
+
+# Schema
+
+O `Schema` define a estrutura dos documentos de uma Collection.
+
+Além dos tipos dos campos, ele também controla validações, valores padrão, índices únicos e configurações como `timestamps`.
+
+---
+
+## Criando um Schema
+
+```ts title="src/schema.ts"
+import { Schema } from "@tilejs/database";
+
+interface Member {
+  _id?: string;
+  name: string;
+  email: string;
+  age?: number;
+}
+
+export const memberSchema = new Schema<Member>({
+  name: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    lowercase: true,
+  },
+
+  age: {
+    type: Number,
+    min: 0,
+  },
+});
+```
+
+---
+
+## Configuração de campos
+
+<TypeTable
+  type={{
+    type: {
+      description: "Tipo do campo.",
+      type: "String | Number | Boolean | Date | Array | Object",
+    },
+    required: {
+      description: "Define se o campo é obrigatório.",
+      type: "boolean",
+      default: "false",
+    },
+    unique: {
+      description: "Cria um índice único para o campo.",
+      type: "boolean",
+      default: "false",
+    },
+    default: {
+      description: "Valor padrão.",
+      type: "any",
+    },
+    lowercase: {
+      description: "Converte textos para minúsculas.",
+      type: "boolean",
+      default: "false",
+    },
+    trim: {
+      description: "Remove espaços extras.",
+      type: "boolean",
+      default: "false",
+    },
+    minLength: {
+      description: "Quantidade mínima de caracteres.",
+      type: "number",
+    },
+    maxLength: {
+      description: "Quantidade máxima de caracteres.",
+      type: "number",
+    },
+    min: {
+      description: "Valor mínimo.",
+      type: "number",
+    },
+    max: {
+      description: "Valor máximo.",
+      type: "number",
+    },
+    enum: {
+      description: "Lista de valores permitidos.",
+      type: "any[]",
+    },
+  }}
+/>
+
+---
+
+## Opções do Schema
+
+O construtor também aceita opções para controlar o comportamento da Collection.
+
+```ts
+const schema = new Schema(
+  {
+    name: String,
+  },
+  {
+    timestamps: true,
+    versionKey: true,
+    _id: true,
+    collection: "members",
+  }
+);
+```
+
+<TypeTable
+  type={{
+    timestamps: {
+      description: "Adiciona automaticamente os campos createdAt e updatedAt.",
+      type: "boolean",
+      default: "true",
+    },
+    versionKey: {
+      description: "Adiciona o campo interno __v.",
+      type: "boolean",
+      default: "true",
+    },
+    _id: {
+      description: "Adiciona o campo interno _id.",
+      type: "boolean",
+      default: "true",
+    },
+    collection: {
+      description: "Nome da Collection associado ao Schema.",
+      type: "string",
+    },
+  }}
+/>
+
+---
+
+## Campos internos
+
+Por padrão, o TileJS adiciona automaticamente alguns campos.
+
+| Campo | Descrição |
+| ------ | --------- |
+| `_id` | Identificador único do documento. |
+| `__v` | Controle interno de versão. |
+| `createdAt` | Data de criação (quando `timestamps` está ativo). |
+| `updatedAt` | Data da última atualização (quando `timestamps` está ativo). |
+
+---
+
+## Índices únicos
+
+Todo campo definido com `unique: true` recebe automaticamente um índice próprio.
+
+```ts
+email: {
+  type: String,
+  unique: true,
+}
+```
+
+Isso gera:
+
+<Files>
+  <Folder name="members" defaultOpen>
+    <File name="_collection_index_email.json" />
+  </Folder>
+</Files>
+
+Conteúdo:
+
+```json title="_collection_index_email.json"
+{
+  "john@example.com": "68526dba05db8ec36dcb33d8"
+}
+```
+
+<Callout type="tip">
+Os índices são utilizados para impedir valores duplicados e acelerar consultas por campos únicos.
+</Callout>
+
+---
+
+## Descrevendo um Schema
+
+O método `describe()` retorna uma descrição completa do Schema.
+
+```ts
+console.log(memberSchema.describe());
+```
+
+Saída:
+
+```ts
+{
+  fields: {
+    _id: { ... },
+    name: { ... },
+    email: { ... },
+    age: { ... },
+    __v: { ... }
+  },
+  timestamps: true,
+  collection: undefined
+}
+```
+
+---
+
+## Próximo passo
+
+Agora que você criou um Schema, é hora de utilizá-lo em uma Collection.
+
+<Cards>
+  <Card
+    icon={<TableProperties />}
+    title="Collections"
+    href="/docs/database/collections"
+  >
+    Aprenda como criar Collections utilizando um Schema.
+  </Card>
+</Cards>

@@ -1,0 +1,9 @@
+{
+    "services": {
+        "github": {
+            "owner": "yeyTaken",
+            "repository": "tilejs",
+            "brench": "main"
+        }
+    }
+}

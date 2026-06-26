@@ -1,0 +1,44 @@
+{
+  "name": "@tilejs/base",
+  "version": "0.0.0",
+  "type": "module",
+  "author": {
+    "name": "Israel R. Jatobá",
+    "email": "contact.israeljatoba@gmail.com",
+    "url": "https://github.com/yeyTaken"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/tilejs-org/tile",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tilejs-org/tile.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tilejs-org/tile/issues"
+  },
+  "keywords": [],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=20",
+    "bun": ">=1"
+  },
+  "scripts": {
+    "build": "tsc & echo ✔ Ok",
+    "prepublishOnly": "bun run build"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.2"
+  }
+}
