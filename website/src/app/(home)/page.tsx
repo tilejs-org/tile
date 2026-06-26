@@ -4,11 +4,11 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: {
-    default: "TileJS — Ecossistema moderno para desenvolvedores",
-    template: "%s | TileJS",
+    default: "Tile.JS — Ecossistema moderno para desenvolvedores",
+    template: "%s | Tile.JS",
   },
 
-  metadataBase: new URL("https://tilejs.vercel.app"),
+  metadataBase: new URL("https://tile.js.org"),
 };
 
 export default function Page() {
@@ -23,7 +23,7 @@ export default function Page() {
         <h1 className="text-4xl md:text-6xl font-black tracking-[-0.04em] leading-tight">
           O ecossistema para
           <br />
-          construir o futuro do <span className="text-primary">TileJS</span>
+          construir o futuro do <span className="text-primary">Tile.JS</span>
         </h1>
 
         {/* Subtitle */}
@@ -75,7 +75,7 @@ export default function Page() {
 
         {/* Footer hint */}
         <p className="mt-16 text-xs text-black/30 dark:text-white/30">
-          TileJS • build faster, think simpler
+          Tile.JS • build faster, think simpler
         </p>
       </div>
     </main>

@@ -1,7 +1,7 @@
 # dependencies (bun install)
 node_modules
 
-# @tilejs/database
+# @tile.js/database
 .tile
 
 # output

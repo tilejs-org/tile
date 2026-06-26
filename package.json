@@ -1,6 +1,6 @@
 {
-  "name": "@tilejs/root",
-  "version": "0.2.0",
+  "name": "@tile.js/root",
+  "version": "0.2.1",
   "license": "MIT",
   "private": true,
   "scripts": {
@@ -31,7 +31,7 @@
   "catalog": {
     "@types/node": "^24",
     "@types/bun": "latest",
-    "@tilejs/config": "*",
+    "@tile.js/config": "*",
     "typescript": "^5",
     "tsx": "^4"
   },

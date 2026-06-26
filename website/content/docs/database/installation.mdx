@@ -1,6 +1,6 @@
 ---
 title: Instalação
-description: Instale o TileJS Database no seu projeto
+description: Instale o Tile.JS Database no seu projeto
 icon: Download
 ---
 
@@ -9,7 +9,7 @@ import { File, Folder, Files } from "fumadocs-ui/components/files";
 
 # Instalação
 
-O **@tilejs/database** pode ser instalado utilizando qualquer gerenciador de pacotes compatível com o Node.js ou Bun.
+O **@tile.js/database** pode ser instalado utilizando qualquer gerenciador de pacotes compatível com o Node.js ou Bun.
 
 <Callout type="info">
 É recomendado utilizar a versão mais recente do pacote para aproveitar novos recursos e correções.
@@ -24,7 +24,7 @@ O **@tilejs/database** pode ser instalado utilizando qualquer gerenciador de pac
 <Tab value="bun">
 
 ```bash
-bun add @tilejs/database
+bun add @tile.js/database
 ```
 
 </Tab>
@@ -32,7 +32,7 @@ bun add @tilejs/database
 <Tab value="npm">
 
 ```bash
-npm install @tilejs/database
+npm install @tile.js/database
 ```
 
 </Tab>
@@ -40,7 +40,7 @@ npm install @tilejs/database
 <Tab value="pnpm">
 
 ```bash
-pnpm add @tilejs/database
+pnpm add @tile.js/database
 ```
 
 </Tab>
@@ -48,7 +48,7 @@ pnpm add @tilejs/database
 <Tab value="yarn">
 
 ```bash
-yarn add @tilejs/database
+yarn add @tile.js/database
 ```
 
 </Tab>
@@ -72,9 +72,9 @@ yarn add @tilejs/database
 Crie um arquivo chamado `index.ts` e importe o pacote:
 
 ```ts title="index.ts"
-import { Database, Schema } from "@tilejs/database";
+import { Database, Schema } from "@tile.js/database";
 
-console.log("TileJS Database instalado com sucesso!");
+console.log("Tile.JS Database instalado com sucesso!");
 ```
 
 Execute:
@@ -122,7 +122,7 @@ Após criar sua primeira `Database`, a pasta `.tile` será criada automaticament
 
 ## O que é criado?
 
-Na primeira vez que uma coleção é criada, o TileJS gera automaticamente toda a estrutura necessária para armazenar os dados.
+Na primeira vez que uma coleção é criada, o Tile.JS gera automaticamente toda a estrutura necessária para armazenar os dados.
 
 Isso inclui:
 
@@ -135,7 +135,7 @@ Isso inclui:
 Você não precisa criar nenhum desses arquivos manualmente.
 
 <Callout type="tip">
-O TileJS utiliza arquivos **BSON** para armazenar documentos e arquivos **JSON** para metadados e índices, permitindo um banco de dados leve e portátil.
+O Tile.JS utiliza arquivos **BSON** para armazenar documentos e arquivos **JSON** para metadados e índices, permitindo um banco de dados leve e portátil.
 </Callout>
 
 ---

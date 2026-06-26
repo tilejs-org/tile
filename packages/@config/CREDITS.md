@@ -11,6 +11,6 @@ Pacotes utilizados como referência:
 * `packages/@config`
 * `packages/@template`
 
-Os trechos foram modificados para se integrarem ao ecossistema **TileJS**.
+Os trechos foram modificados para se integrarem ao ecossistema **Tile.JS**.
 
 Agradecimentos ao autor por tornar o projeto disponível como código aberto.

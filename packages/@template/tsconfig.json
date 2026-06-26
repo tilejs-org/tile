@@ -1,5 +1,5 @@
 {
-    "extends": "@tilejs/config/tsconfig",
+    "extends": "@tile.js/config/tsconfig",
     "compilerOptions": {
         "rootDir": "./src",
         "outDir": "./dist"

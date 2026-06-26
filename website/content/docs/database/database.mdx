@@ -10,7 +10,7 @@ import { DatabaseIcon, TableProperties } from "lucide-react";
 
 # Database
 
-A classe `Database` é responsável por criar e gerenciar uma database do TileJS.
+A classe `Database` é responsável por criar e gerenciar uma database do Tile.JS.
 
 Ela define onde os arquivos serão armazenados, o nome da database, o comportamento do logger e outras configurações globais.
 
@@ -21,7 +21,7 @@ Ela define onde os arquivos serão armazenados, o nome da database, o comportame
 A forma mais simples de criar uma database é utilizando todas as configurações padrão.
 
 ```ts title="src/index.ts"
-import { Database } from "@tilejs/database";
+import { Database } from "@tile.js/database";
 
 const database = new Database();
 ```
@@ -39,7 +39,7 @@ Por padrão, será criada uma database chamada **test**, armazenada em:
 Todas as opções podem ser personalizadas.
 
 ```ts title="src/index.ts"
-import { Database } from "@tilejs/database";
+import { Database } from "@tile.js/database";
 
 const database = new Database({
   dbName: "my-database",
@@ -121,7 +121,7 @@ Esse modo é recomendado para CLIs e ferramentas utilizadas em diversos projetos
 O logger facilita o desenvolvimento exibindo informações importantes durante a execução.
 
 ```ts
-import { Database } from "@tilejs/database";
+import { Database } from "@tile.js/database";
 
 const database = new Database({
   logger: {

@@ -1,3 +1,3 @@
-import { build } from "@tilejs/config/build";
+import { build } from "@tile.js/config/build";
 
 await build();

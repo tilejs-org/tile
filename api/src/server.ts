@@ -16,7 +16,7 @@ import { versionsRoutes } from "./http/routes/versions.js";
 
 import { logger } from "./utils/logger.js";
 
-const app = new Elysia({ name: "TileJS API", adapter: node() })
+const app = new Elysia({ name: "Tile.JS API", adapter: node() })
   .use(
     cors({
       origin: [env.TILE_DEV_URL, env.TILE_URL],
@@ -32,9 +32,9 @@ const app = new Elysia({ name: "TileJS API", adapter: node() })
       },
       documentation: {
         info: {
-          title: "TileJS API",
+          title: "Tile.JS API",
           version: Package.version,
-          description: "Principal API for TileJS, Inc.",
+          description: "Principal API for Tile.JS, Inc.",
         },
         // components: (await OpenAPI.components) as any,
         // paths: (await OpenAPI.getPaths()) as any,

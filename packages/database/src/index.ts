@@ -3,7 +3,7 @@
  *
  * @example
  * ```ts
- * import { Tile, Schema } from "@tilejs/database";
+ * import { Tile, Schema } from "@tile.js/database";
  * ```
  */
 // export { Tile } from "./core/database.js";

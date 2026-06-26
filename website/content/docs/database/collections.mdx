@@ -25,7 +25,7 @@ Uma Collection é semelhante a uma tabela em bancos de dados relacionais, porém
 Primeiro crie um Schema.
 
 ```ts title="schema.ts"
-import { Schema } from "@tilejs/database";
+import { Schema } from "@tile.js/database";
 
 interface Member {
   _id?: string;
@@ -49,7 +49,7 @@ export const memberSchema = new Schema<Member>({
 Depois registre a Collection na Database.
 
 ```ts title="database.ts"
-import { Database } from "@tilejs/database";
+import { Database } from "@tile.js/database";
 import { memberSchema } from "./schema";
 
 const connection = new Database();
@@ -65,7 +65,7 @@ Agora a Collection poderá ser utilizada normalmente.
 
 ## Estrutura criada
 
-Na primeira execução o TileJS cria automaticamente todos os arquivos necessários.
+Na primeira execução o Tile.JS cria automaticamente todos os arquivos necessários.
 
 <Files>
   <Folder name=".tile">

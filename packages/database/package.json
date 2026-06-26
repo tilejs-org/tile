@@ -1,6 +1,6 @@
 {
-  "name": "@tilejs/database",
-  "version": "1.2.2",
+  "name": "@tile.js/database",
+  "version": "1.0.0",
   "homepage": "https://tile.js.org/",
   "license": "MIT",
   "type": "module",
@@ -44,7 +44,7 @@
   ],
   "devDependencies": {
     "@types/bun": "catalog:",
-    "@tilejs/config": "catalog:",
+    "@tile.js/config": "catalog:",
     "typescript": "catalog:"
   },
   "dependencies": {

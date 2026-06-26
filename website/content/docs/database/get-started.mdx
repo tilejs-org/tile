@@ -1,6 +1,6 @@
 ---
 title: Iniciando
-description: Visão geral e primeiros passos com o TileJS Database
+description: Visão geral e primeiros passos com o Tile.JS Database
 icon: Rocket
 ---
 
@@ -10,12 +10,12 @@ import { RocketIcon, DatabaseIcon, BoxesIcon, FileCodeIcon } from "lucide-react"
 
 # Bem-vindo
 
-O **@tilejs/database** é um banco de dados local, tipado e baseado em schemas para aplicações Node.js e Bun.
+O **@tile.js/database** é um banco de dados local, tipado e baseado em schemas para aplicações Node.js e Bun.
 
 Ele foi desenvolvido para oferecer uma API simples, forte integração com TypeScript e armazenamento em arquivos BSON, sem depender de um servidor externo.
 
 <Callout type="info">
-Se esta é sua primeira vez utilizando o TileJS Database, siga esta ordem de leitura:
+Se esta é sua primeira vez utilizando o Tile.JS Database, siga esta ordem de leitura:
 
 **Instalação → Database → Schema → Collections → CRUD**
 </Callout>
@@ -47,7 +47,7 @@ Se esta é sua primeira vez utilizando o TileJS Database, siga esta ordem de lei
 ## Exemplo rápido
 
 ```ts title="src/index.ts"
-import { Database, Schema } from "@tilejs/database";
+import { Database, Schema } from "@tile.js/database";
 
 interface Member {
   _id?: string;
@@ -141,7 +141,7 @@ A pasta <code>.tile</code> contém todos os arquivos da database e é criada aut
 
 ## Como funcionam os índices
 
-Sempre que um campo do schema possuir `unique: true`, o TileJS cria automaticamente um arquivo de índice exclusivo para esse campo.
+Sempre que um campo do schema possuir `unique: true`, o Tile.JS cria automaticamente um arquivo de índice exclusivo para esse campo.
 
 Esses índices permitem localizar registros rapidamente e garantem que valores únicos nunca sejam duplicados.
 
@@ -182,7 +182,7 @@ Como `email` foi definido com `unique: true`, o índice armazena a relação ent
 <Callout type="tip">
 Qualquer campo marcado com <code>unique: true</code> gera automaticamente um arquivo chamado <code>_collection_index_&lt;nome-do-campo&gt;.json</code>.
 
-Isso permite que o TileJS verifique rapidamente se um valor já existe antes de inserir ou atualizar um documento, além de acelerar consultas por campos únicos.
+Isso permite que o Tile.JS verifique rapidamente se um valor já existe antes de inserir ou atualizar um documento, além de acelerar consultas por campos únicos.
 </Callout>
 
 ---
@@ -212,7 +212,7 @@ schema: {
     title="Instalação"
     href="/docs/database/installation"
   >
-    Aprenda como instalar o TileJS Database.
+    Aprenda como instalar o Tile.JS Database.
   </Card>
 
   <Card

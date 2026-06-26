@@ -1,8 +1,8 @@
 <div align="center">
-  <!-- <img src="../../assets/..." width="456" alt="TileJS"></img> -->
+  <!-- <img src="../../assets/..." width="456" alt="Tile.JS"></img> -->
   
   <p>
-  <!-- TileJS badges -->
+  <!-- Tile.JS badges -->
   
 <img src="https://img.shields.io/badge/Bun-1.x-black?style=for-the-badge&logo=bun" />
 <img src="https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white" />
@@ -10,7 +10,7 @@
 </p>
 </div>
 
-Obrigado por considerar contribuir com o TileJS.
+Obrigado por considerar contribuir com o Tile.JS.
 
 Este projeto é um monorepo mantido com Bun e organizado em múltiplos pacotes. Toda contribuição é bem-vinda, seja correção de bugs, melhorias de documentação, otimizações de performance ou novas funcionalidades.
 
@@ -53,7 +53,7 @@ Este projeto é um monorepo mantido com Bun e organizado em múltiplos pacotes. 
 
 ```bash
 git clone https://github.com/tilejs-org/tile.git
-cd tilejs
+cd tile
 ```
 
 Instale as dependências:
@@ -67,7 +67,7 @@ bun install
 ## Estrutura do repositório
 
 ```bash
-tilejs/
+tile/
 ├── api
 ├── benchmarks/
 │   ├── database/
@@ -295,7 +295,7 @@ Entre em contato através dos canais oficiais do projeto para divulgação respo
 
 ## Filosofia do Projeto
 
-TileJS busca ser:
+Tile.JS busca ser:
 
 * Simples
 * Rápido
@@ -316,7 +316,7 @@ Ao contribuir, priorize:
 
 Ao enviar uma contribuição, você concorda que seu código será licenciado sob os termos da licença do projeto.
 
-Obrigado por ajudar a construir o TileJS.
+Obrigado por ajudar a construir o Tile.JS.
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/catppuccin/catppuccin/main/assets/footers/gray0_ctp_on_line.svg?sanitize=true"></img>

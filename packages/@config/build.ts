@@ -5,7 +5,7 @@
  * https://github.com/rinckodev/constatic/tree/master/packages/%40config
  *
  * Autor original: Rincko
- * Modificado para uso no ecossistema TileJS.
+ * Modificado para uso no ecossistema Tile.JS.
  */
 
 import { $, Glob, type BuildConfig } from "bun";

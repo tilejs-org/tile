@@ -16,14 +16,14 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: {
-    default: "TileJS — Ecossistema moderno para desenvolvedores",
-    template: "%s | TileJS",
+    default: "Tile.JS — Ecossistema moderno para desenvolvedores",
+    template: "%s | Tile.JS",
   },
   description:
-    "TileJS é um ecossistema moderno de ferramentas, database tipada e APIs rápidas para desenvolvedores que querem velocidade sem complexidade.",
-  applicationName: "TileJS",
+    "Tile.JS é um ecossistema moderno de ferramentas, database tipada e APIs rápidas para desenvolvedores que querem velocidade sem complexidade.",
+  applicationName: "Tile.JS",
   keywords: [
-    "TileJS",
+    "Tile.JS",
     "database tipada",
     "TypeScript database",
     "developer tools",
@@ -35,14 +35,14 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Israel R. Jatobá" }],
 
-  metadataBase: new URL("https://tilejs.vercel.app"),
+  metadataBase: new URL("https://tile.js.org"),
 
   openGraph: {
-    title: "TileJS — Ecossistema moderno para desenvolvedores",
+    title: "Tile.JS — Ecossistema moderno para desenvolvedores",
     description:
       "Database tipada, ferramentas modernas e APIs rápidas para construir o futuro com velocidade e simplicidade.",
-    url: "https://tilejs.vercel.app",
-    siteName: "TileJS",
+    url: "https://tile.js.org",
+    siteName: "Tile.JS",
     type: "website",
   },
 
@@ -97,7 +97,7 @@ export default function Layout({ children }: LayoutProps<"/">) {
                   <div className="-mx-3 -mt-3">
                     <Image
                       src={Preview}
-                      alt="Preview do TileJS"
+                      alt="Preview do Tile.JS"
                       className="rounded-t-lg object-cover"
                       style={{
                         maskImage:
@@ -108,7 +108,7 @@ export default function Layout({ children }: LayoutProps<"/">) {
 
                   <p className="font-medium">Introdução</p>
                   <p className="text-fd-muted-foreground text-sm">
-                    Conheça o TileJS, explore seus pacotes e descubra como criar
+                    Conheça o Tile.JS, explore seus pacotes e descubra como criar
                     aplicações modernas utilizando TypeScript e Bun.
                   </p>
                 </NavbarMenuLink>
@@ -132,7 +132,7 @@ export default function Layout({ children }: LayoutProps<"/">) {
 
                   <p className="font-medium">Instalação</p>
                   <p className="text-fd-muted-foreground text-sm">
-                    Instale o TileJS Database no seu projeto
+                    Instale o Tile.JS Database no seu projeto
                   </p>
                 </NavbarMenuLink>
                 <NavbarMenuLink
@@ -155,7 +155,7 @@ export default function Layout({ children }: LayoutProps<"/">) {
                   <p className="font-medium">CRUD</p>
                   <p className="text-fd-muted-foreground text-sm">
                     Explore um projeto completo utilizando os principais
-                    recursos do TileJS como ponto de partida.
+                    recursos do Tile.JS como ponto de partida.
                   </p>
                 </NavbarMenuLink>
               </NavbarMenuContent>

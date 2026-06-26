@@ -1,4 +1,4 @@
-export const appName = 'TileJS';
+export const appName = 'Tile.JS';
 export const docsRoute = '/docs';
 export const docsImageRoute = '/og/docs';
 export const docsContentRoute = '/llms.mdx/docs';

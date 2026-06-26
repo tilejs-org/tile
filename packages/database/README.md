@@ -1,21 +1,21 @@
 <div align="center">
-  <!-- <img src="../../assets/..." width="456" alt="TileJS"></img> -->
+  <!-- <img src="../../assets/..." width="456" alt="Tile.JS"></img> -->
   
   <p>
-  <!-- TileJS badges -->
-  <a href="https://www.npmjs.com/package/@tilejs/database">
-    <img src="https://img.shields.io/npm/v/@tilejs/database?style=for-the-badge&color=36a5f4&label=npm&logo=npm" />
+  <!-- Tile.JS badges -->
+  <a href="https://www.npmjs.com/package/@tile.js/database">
+    <img src="https://img.shields.io/npm/v/@tile.js/database?style=for-the-badge&color=36a5f4&label=npm&logo=npm" />
   </a>
-  <a href="https://www.npmjs.com/package/@tilejs/database">
-    <img src="https://img.shields.io/npm/dt/@tilejs/database?style=for-the-badge&color=f5a97f&label=downloads&logo=npm" />
+  <a href="https://www.npmjs.com/package/@tile.js/database">
+    <img src="https://img.shields.io/npm/dt/@tile.js/database?style=for-the-badge&color=f5a97f&label=downloads&logo=npm" />
   </a>
   <a href="https://github.com/tilejs-org/tile/tree/main/packages/database">
-    <img src="https://img.shields.io/badge/github-@tilejs/database-8da6ce?style=for-the-badge&logo=github" />
+    <img src="https://img.shields.io/badge/github-@tile.js/database-8da6ce?style=for-the-badge&logo=github" />
   </a>
 </p>
 </div>
 
-# TileJS Database
+# Tile.JS Database
 
 Um banco de dados local, leve e tipado para **Node.js** e **Bun**.
 
@@ -28,19 +28,19 @@ Um banco de dados local, leve e tipado para **Node.js** e **Bun**.
 ## Instalação
 
 ```bash
-npm install @tilejs/database
+npm install @tile.js/database
 ```
 
 Ou com Bun:
 
 ```bash
-bun add @tilejs/database
+bun add @tile.js/database
 ```
 
 ## Exemplo
 
 ```ts
-import { Database, Schema } from "@tilejs/database";
+import { Database, Schema } from "@tile.js/database";
 
 interface User {
   _id?: string;
@@ -81,7 +81,7 @@ console.log(user);
 
 📚 A documentação completa está disponível em:
 
-**https://tilejs.vercel.app/docs/database/get-started**
+**https://tile.js.org/docs/database/get-started**
 
 ## Benchmark
 
@@ -100,9 +100,9 @@ console.log(user);
 | Delete    | 56.43 ms |
 
 ## Links
-- TileJS [website](https://tile.js.org/) | [Documentation](https://tile.js.org/docs).
+- Tile.JS [website](https://tile.js.org/) | [Documentation](https://tile.js.org/docs).
 - [GitHub](https://github.com/tilejs-org/tile) monorep.
-- [NPM](https://www.npmjs.com/package/@tilejs/database), Latest version.
+- [NPM](https://www.npmjs.com/package/@tile.js/database), Latest version.
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/catppuccin/catppuccin/main/assets/footers/gray0_ctp_on_line.svg?sanitize=true"></img>

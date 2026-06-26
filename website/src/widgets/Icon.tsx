@@ -119,7 +119,7 @@ export function Icon({
               duration: 0.2,
             }}
           >
-            {"TileJS".split("").map((char, index) => (
+            {"Tile.JS".split("").map((char, index) => (
               <motion.span
                 key={index}
                 animate={{
@@ -179,7 +179,7 @@ export function Icon({
         >
           <Image
             src="/images/icon.png"
-            alt="TileJS"
+            alt="Tile.JS"
             width={28}
             height={28}
             priority
@@ -190,7 +190,7 @@ export function Icon({
         <div>
           <Image
             src="/images/icon.png"
-            alt="TileJS"
+            alt="Tile.JS"
             width={28}
             height={28}
             priority

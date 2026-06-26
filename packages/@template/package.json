@@ -1,5 +1,5 @@
 {
-  "name": "@tilejs/template",
+  "name": "@tile.js/template",
   "version": "1.0.0",
   "homepage": "https://tile.js.org/",
   "license": "MIT",
@@ -23,7 +23,7 @@
   "keywords": [],
   "devDependencies": {
     "@types/bun": "catalog:",
-    "@tilejs/config": "catalog:",
+    "@tile.js/config": "catalog:",
     "typescript": "catalog:"
   },
   "main": "./dist/index.js",

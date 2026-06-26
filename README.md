@@ -1,8 +1,8 @@
 <div align="center">
-  <!-- <img src="../../assets/..." width="456" alt="TileJS"></img> -->
+  <!-- <img src="../../assets/..." width="456" alt="Tile.JS"></img> -->
   
   <p>
-  <!-- TileJS badges -->
+  <!-- Tile.JS badges -->
   
 <img src="https://img.shields.io/endpoint?url=https://api-tilejs.vercel.app/versions/badge/root&style=for-the-badge" />
 <img src="https://img.shields.io/badge/Bun-1.x-black?style=for-the-badge&logo=bun" />
@@ -15,17 +15,17 @@
 
 > [!note]
 >
-> ### O que é o TileJS?
+> ### O que é o Tile.JS?
 >
-> O TileJS é uma plataforma que reúne diversos serviços e ferramentas geoespaciais em um único ecossistema. Projetado para desenvolvedores e comunidades, ele simplifica operações relacionadas a mapas, localização e dados geográficos, permitindo a criação de aplicações poderosas com menos esforço e maior produtividade.
+> O Tile.JS é uma plataforma que reúne diversos serviços e ferramentas geoespaciais em um único ecossistema. Projetado para desenvolvedores e comunidades, ele simplifica operações relacionadas a mapas, localização e dados geográficos, permitindo a criação de aplicações poderosas com menos esforço e maior produtividade.
 
 ## Pacotes NPM:
 
-- [@tilejs/database](https://www.npmjs.com/package/@tilejs/database)
+- [@tile.js/database](https://www.npmjs.com/package/@tile.js/database)
 
 ## Links
 
-- TileJS [website](https://tile.js.org/) | [Documentation](https://tile.js.org/docs).
+- Tile.JS [website](https://tile.js.org/) | [Documentation](https://tile.js.org/docs).
 - [GitHub](https://github.com/tilejs-org/tile) monorep.
 
 <p align="center">

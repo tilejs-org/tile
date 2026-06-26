@@ -4,7 +4,7 @@ export const indexRoutes = new Elysia()
   .get(
     "/",
     () => ({
-      message: "Hello, TileJS.",
+      message: "Hello, Tile.JS.",
     }),
     {
       detail: {
