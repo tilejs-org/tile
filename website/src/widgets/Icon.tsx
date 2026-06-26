@@ -30,8 +30,7 @@ export function Icon({
   const isActive = isHovered || isOpen;
   const title = (
     <>
-      <span>Tile</span>
-      <span className="text-primary">JS</span>
+      <span>Tile.JS</span>
     </>
   );
 
