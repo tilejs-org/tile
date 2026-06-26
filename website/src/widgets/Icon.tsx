@@ -45,9 +45,13 @@ export function Icon({
   function renderText() {
     if (isOpen) {
       return (
-        <span className={clsx("ml-2", "text-2xl font-black leading-none tracking-[-0.04em]")}>
-          <span>Tile</span>
-          <span className="text-primary">JS</span>
+        <span
+          className={clsx(
+            "ml-2",
+            "text-2xl font-black leading-none tracking-[-0.04em]",
+          )}
+        >
+          <span>Tile.JS</span>
         </span>
       );
     }
@@ -86,8 +90,7 @@ export function Icon({
               "text-2xl font-black leading-none tracking-[-0.04em]",
             )}
           >
-            <span>Tile</span>
-            <span className="text-primary">JS</span>
+            <span>Tile.JS</span>
           </motion.span>
         );
 
@@ -143,9 +146,13 @@ export function Icon({
 
       default:
         return (
-          <span className={clsx("ml-2", "text-2xl font-black leading-none tracking-[-0.04em]")}>
-            <span>Tile</span>
-            <span className="text-primary">JS</span>
+          <span
+            className={clsx(
+              "ml-2",
+              "text-2xl font-black leading-none tracking-[-0.04em]",
+            )}
+          >
+            <span>Tile.JS</span>
           </span>
         );
     }
