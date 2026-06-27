@@ -1,59 +1,83 @@
 ---
 title: Instalação
-description: Instale o Tile.JS Database no seu projeto
+description: Instale o Tile.JS Database e os adapters opcionais
 icon: Download
 ---
 
-import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 import { File, Folder, Files } from "fumadocs-ui/components/files";
 
 # Instalação
 
-O **@tile.js/database** pode ser instalado utilizando qualquer gerenciador de pacotes compatível com o Node.js ou Bun.
+O **@tile.js/database** instala apenas o núcleo da lib e o adapter padrão local em BSON.
 
-<Callout type="info">
-É recomendado utilizar a versão mais recente do pacote para aproveitar novos recursos e correções.
-</Callout>
+Adapters externos como **MongoDB** e **Mongoose** usam dependências fornecidas pelo consumidor final.
 
 ---
 
-## Instale o pacote
+## Instale o pacote principal
 
-<Tabs items={["bun", "npm", "pnpm", "yarn"]} >
-
-<Tab value="bun">
+<Tabs items={["bun", "npm", "pnpm", "yarn"]}>
+  <Tab value="bun">
 
 ```bash
 bun add @tile.js/database
 ```
 
-</Tab>
+  </Tab>
 
-<Tab value="npm">
+  <Tab value="npm">
 
 ```bash
 npm install @tile.js/database
 ```
 
-</Tab>
+  </Tab>
 
-<Tab value="pnpm">
+  <Tab value="pnpm">
 
 ```bash
 pnpm add @tile.js/database
 ```
 
-</Tab>
+  </Tab>
 
-<Tab value="yarn">
+  <Tab value="yarn">
 
 ```bash
 yarn add @tile.js/database
 ```
 
-</Tab>
-
+  </Tab>
 </Tabs>
+
+---
+
+## Instale adapters opcionais
+
+Se você quiser usar adapters remotos, instale também a dependência correspondente no seu projeto.
+
+<Tabs items={["mongodb", "mongoose"]}>
+  <Tab value="mongodb">
+
+```bash
+npm install mongodb
+```
+
+  </Tab>
+
+  <Tab value="mongoose">
+
+```bash
+npm install mongoose
+```
+
+  </Tab>
+</Tabs>
+
+<Callout type="info">
+O pacote **@tile.js/database** não instala `mongodb` nem `mongoose` automaticamente. Essas dependências são responsabilidade do projeto consumidor.
+</Callout>
 
 ---
 
@@ -69,7 +93,7 @@ yarn add @tile.js/database
 
 ## Verificando a instalação
 
-Crie um arquivo chamado `index.ts` e importe o pacote:
+Crie um arquivo `index.ts` e importe o pacote:
 
 ```ts title="index.ts"
 import { Database, Schema } from "@tile.js/database";
@@ -79,33 +103,31 @@ console.log("Tile.JS Database instalado com sucesso!");
 
 Execute:
 
-<Tabs items={["bun", "node"]}>
-
-<Tab value="bun">
+<Tabs items={["bun", "tsx"]}>
+  <Tab value="bun">
 
 ```bash
 bun index.ts
 ```
 
-</Tab>
+  </Tab>
 
-<Tab value="node">
+  <Tab value="tsx">
 
 ```bash
-node index.ts
+npx tsx index.ts
 ```
 
-</Tab>
-
+  </Tab>
 </Tabs>
 
 Se nenhuma mensagem de erro aparecer, a instalação foi concluída corretamente.
 
 ---
 
-## Estrutura do projeto
+## O que é criado no modo padrão
 
-Antes da primeira execução:
+O adapter local padrão cria a estrutura `.tile/database/...` automaticamente na primeira vez que uma collection é usada.
 
 <Files>
   <Folder name="src" defaultOpen>
@@ -116,39 +138,24 @@ Antes da primeira execução:
   <File name="tsconfig.json" />
 </Files>
 
-Após criar sua primeira `Database`, a pasta `.tile` será criada automaticamente.
-
----
-
-## O que é criado?
-
-Na primeira vez que uma coleção é criada, o Tile.JS gera automaticamente toda a estrutura necessária para armazenar os dados.
-
-Isso inclui:
-
-- A pasta `.tile`
-- A database
-- As collections
-- Os arquivos de schema
-- Os índices únicos (`unique`)
-
-Você não precisa criar nenhum desses arquivos manualmente.
+Após a primeira operação local, a pasta `.tile` será criada automaticamente.
 
 <Callout type="tip">
-O Tile.JS utiliza arquivos **BSON** para armazenar documentos e arquivos **JSON** para metadados e índices, permitindo um banco de dados leve e portátil.
+No adapter padrão, os documentos são armazenados em **BSON** e os metadados/índices em **JSON**.
 </Callout>
 
 ---
 
 ## Próximo passo
 
-Agora que o pacote está instalado, o próximo passo é criar sua primeira conexão com a database.
+Agora que o pacote está instalado, o próximo passo é entender como configurar a classe `Database` e como trocar o backend através de adapters.
 
 <Cards>
-  <Card
-    title="Criando uma Database"
-    href="/docs/database/database"
-  >
-    Aprenda como configurar e inicializar sua primeira database.
+  <Card title="Database" href="/docs/database/database">
+    Veja a configuração principal da lib.
+  </Card>
+
+  <Card title="Adapters" href="/docs/database/adapters">
+    Aprenda a usar o adapter padrão, MongoDB e Mongoose.
   </Card>
 </Cards>

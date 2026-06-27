@@ -1,5 +1,5 @@
 import { Schema } from "./schema.js";
-import { BsonStorageEngine } from "../storage/filesystem.js";
+import type { StorageAdapter } from "../adapters/types.js";
 import { Logger } from "../utils/logger.js";
 import { Validator } from "../utils/validator.js";
 import type {
@@ -11,7 +11,7 @@ import type {
   PaginateResult,
   SchemaDescription,
 } from "./types.js";
-import { ObjectId } from "../storage/bson.js";
+import { ObjectId } from "../adapters/default/bson.js";
 
 export interface Collection<T extends object = Record<string, unknown>> {
   readonly schema: Schema<T>;
@@ -49,7 +49,7 @@ export interface Collection<T extends object = Record<string, unknown>> {
 export class Model<T extends object = Record<string, unknown>>
   implements Collection<T> {
   public readonly schema: Schema<T>;
-  private storage: BsonStorageEngine;
+  private storage: StorageAdapter;
   private logger: Logger;
   private name: string;
   private uniqueFields: Set<string> = new Set();
@@ -58,7 +58,7 @@ export class Model<T extends object = Record<string, unknown>>
   constructor(
     name: string,
     schema: Schema<T>,
-    storage: BsonStorageEngine,
+    storage: StorageAdapter,
     logger: Logger,
   ) {
     this.name = name;
@@ -66,12 +66,10 @@ export class Model<T extends object = Record<string, unknown>>
     this.storage = storage;
     this.logger = logger;
     this.identifyUniqueFields();
-    this.ready = this.storage.prepareCollection(
-      this.name,
-      Array.from(this.uniqueFields),
-    ).then(() =>
-      this.storage.writeCollectionSchema(this.name, this.schema.describe()),
-    );
+    this.ready = this.storage.prepareCollection(this.name, {
+      uniqueFields: Array.from(this.uniqueFields),
+      schema: this.schema.describe(),
+    });
   }
 
   private identifyUniqueFields(): void {
@@ -322,7 +320,7 @@ export class Model<T extends object = Record<string, unknown>>
       await this.ready;
 
       const indexedEntry = this.getIndexedFilterEntry(filter);
-      if (indexedEntry) {
+      if (indexedEntry && this.storage.readByIndexedField) {
         const [field, value] = indexedEntry;
         const doc = await this.storage.readByIndexedField(
           this.name,

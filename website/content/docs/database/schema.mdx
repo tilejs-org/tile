@@ -10,9 +10,16 @@ import { TableProperties } from "lucide-react";
 
 # Schema
 
-O `Schema` define a estrutura dos documentos de uma Collection.
+O `Schema` define a estrutura dos documentos de uma collection.
 
-Além dos tipos dos campos, ele também controla validações, valores padrão, índices únicos e configurações como `timestamps`.
+Além dos tipos dos campos, ele controla:
+
+- validações
+- defaults
+- índices únicos
+- `timestamps`
+- `versionKey`
+- metadados expostos via `describe()`
 
 ---
 
@@ -26,6 +33,7 @@ interface Member {
   name: string;
   email: string;
   age?: number;
+  verified?: boolean;
 }
 
 export const memberSchema = new Schema<Member>({
@@ -34,17 +42,19 @@ export const memberSchema = new Schema<Member>({
     required: true,
     trim: true,
   },
-
   email: {
     type: String,
     required: true,
     unique: true,
     lowercase: true,
   },
-
   age: {
     type: Number,
     min: 0,
+  },
+  verified: {
+    type: Boolean,
+    default: false,
   },
 });
 ```
@@ -70,16 +80,16 @@ export const memberSchema = new Schema<Member>({
       default: "false",
     },
     default: {
-      description: "Valor padrão.",
+      description: "Valor padrão aplicado quando o campo não é informado.",
       type: "any",
     },
     lowercase: {
-      description: "Converte textos para minúsculas.",
+      description: "Converte strings para minúsculas.",
       type: "boolean",
       default: "false",
     },
     trim: {
-      description: "Remove espaços extras.",
+      description: "Remove espaços extras no início e no fim da string.",
       type: "boolean",
       default: "false",
     },
@@ -92,12 +102,17 @@ export const memberSchema = new Schema<Member>({
       type: "number",
     },
     min: {
-      description: "Valor mínimo.",
+      description: "Valor mínimo para números.",
       type: "number",
     },
     max: {
-      description: "Valor máximo.",
+      description: "Valor máximo para números.",
       type: "number",
+    },
+    auto: {
+      description: "Gera automaticamente um identificador string para o campo.",
+      type: "boolean",
+      default: "false",
     },
     enum: {
       description: "Lista de valores permitidos.",
@@ -110,8 +125,6 @@ export const memberSchema = new Schema<Member>({
 
 ## Opções do Schema
 
-O construtor também aceita opções para controlar o comportamento da Collection.
-
 ```ts
 const schema = new Schema(
   {
@@ -122,29 +135,29 @@ const schema = new Schema(
     versionKey: true,
     _id: true,
     collection: "members",
-  }
+  },
 );
 ```
 
 <TypeTable
   type={{
     timestamps: {
-      description: "Adiciona automaticamente os campos createdAt e updatedAt.",
+      description: "Adiciona automaticamente `createdAt` e `updatedAt`.",
       type: "boolean",
       default: "true",
     },
     versionKey: {
-      description: "Adiciona o campo interno __v.",
+      description: "Adiciona o campo interno `__v`.",
       type: "boolean",
       default: "true",
     },
     _id: {
-      description: "Adiciona o campo interno _id.",
+      description: "Adiciona o campo interno `_id`.",
       type: "boolean",
       default: "true",
     },
     collection: {
-      description: "Nome da Collection associado ao Schema.",
+      description: "Nome lógico associado ao schema para introspecção.",
       type: "string",
     },
   }}
@@ -154,7 +167,7 @@ const schema = new Schema(
 
 ## Campos internos
 
-Por padrão, o Tile.JS adiciona automaticamente alguns campos.
+Por padrão, o Tile.JS adiciona automaticamente:
 
 | Campo | Descrição |
 | ------ | --------- |
@@ -167,7 +180,7 @@ Por padrão, o Tile.JS adiciona automaticamente alguns campos.
 
 ## Índices únicos
 
-Todo campo definido com `unique: true` recebe automaticamente um índice próprio.
+Todo campo definido com `unique: true` recebe um índice próprio no adapter padrão local.
 
 ```ts
 email: {
@@ -193,14 +206,26 @@ Conteúdo:
 ```
 
 <Callout type="tip">
-Os índices são utilizados para impedir valores duplicados e acelerar consultas por campos únicos.
+Nos adapters de MongoDB e Mongoose, o índice é criado no backend remoto em vez de um arquivo local.
 </Callout>
+
+---
+
+## Sobre validação
+
+A validação é simples e previsível:
+
+- filtros e tipos são rasos
+- `Object` e `Array` não possuem schema aninhado
+- `Date` aceita `Date`, `string` ou `number`, desde que o valor seja convertível para uma data válida
+
+Isso mantém a API enxuta, mas ainda não equivale a um sistema completo de schema aninhado.
 
 ---
 
 ## Descrevendo um Schema
 
-O método `describe()` retorna uma descrição completa do Schema.
+O método `describe()` retorna um resumo amigável para tooling e documentação.
 
 ```ts
 console.log(memberSchema.describe());
@@ -215,6 +240,7 @@ Saída:
     name: { ... },
     email: { ... },
     age: { ... },
+    verified: { ... },
     __v: { ... }
   },
   timestamps: true,
@@ -226,14 +252,10 @@ Saída:
 
 ## Próximo passo
 
-Agora que você criou um Schema, é hora de utilizá-lo em uma Collection.
+Depois de definir um schema, registre uma collection na instância principal da sua database.
 
 <Cards>
-  <Card
-    icon={<TableProperties />}
-    title="Collections"
-    href="/docs/database/collections"
-  >
-    Aprenda como criar Collections utilizando um Schema.
+  <Card icon={<TableProperties />} title="Collections" href="/docs/database/collections">
+    Aprenda a criar collections e a usar a API pública de documentos.
   </Card>
 </Cards>

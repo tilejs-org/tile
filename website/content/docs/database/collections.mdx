@@ -1,6 +1,6 @@
 ---
 title: Collections
-description: Crie e gerencie Collections utilizando Schemas
+description: Crie e gerencie collections utilizando schemas
 icon: Table
 ---
 
@@ -10,19 +10,19 @@ import { Table } from "lucide-react";
 
 # Collections
 
-Uma **Collection** é onde os documentos são armazenados.
+Uma **Collection** é a interface que você usa para trabalhar com documentos.
 
-Toda Collection pertence a uma `Database` e utiliza um `Schema` para validar os dados inseridos.
+Toda collection pertence a uma `Database` e utiliza um `Schema` para validar e normalizar os dados.
 
 <Callout type="info">
-Uma Collection é semelhante a uma tabela em bancos de dados relacionais, porém armazena documentos em vez de linhas.
+Uma collection é parecida com uma tabela em bancos relacionais, mas armazena documentos em vez de linhas fixas.
 </Callout>
 
 ---
 
 ## Criando uma Collection
 
-Primeiro crie um Schema.
+Primeiro crie um schema.
 
 ```ts title="schema.ts"
 import { Schema } from "@tile.js/database";
@@ -38,7 +38,6 @@ export const memberSchema = new Schema<Member>({
     type: String,
     required: true,
   },
-
   email: {
     type: String,
     unique: true,
@@ -46,7 +45,7 @@ export const memberSchema = new Schema<Member>({
 });
 ```
 
-Depois registre a Collection na Database.
+Depois registre a collection na database.
 
 ```ts title="database.ts"
 import { Database } from "@tile.js/database";
@@ -59,13 +58,13 @@ export const database = Object.assign(connection, {
 });
 ```
 
-Agora a Collection poderá ser utilizada normalmente.
+A classe `Database` também expõe `model()` como alias de `collection()`.
 
 ---
 
-## Estrutura criada
+## Estrutura criada no adapter padrão
 
-Na primeira execução o Tile.JS cria automaticamente todos os arquivos necessários.
+Na primeira execução local, o Tile.JS cria automaticamente todos os arquivos necessários.
 
 <Files>
   <Folder name=".tile">
@@ -84,41 +83,44 @@ Na primeira execução o Tile.JS cria automaticamente todos os arquivos necessá
 
 ---
 
-## O que cada arquivo faz?
-
-| Arquivo | Descrição |
-| ------- | --------- |
-| `_schema.json` | Descrição completa do Schema. |
-| `_collection_index_id.json` | Índice do campo `_id`. |
-| `_collection_index_<campo>.json` | Índice de qualquer campo marcado com `unique: true`. |
-| `*.bson` | Documentos armazenados pela Collection. |
-
----
-
 ## Métodos disponíveis
-
-Após criar uma Collection você terá acesso aos principais métodos.
 
 <TypeTable
   type={{
-    insertOne: {
-      description: "Insere um documento.",
-      type: "(document) => Promise<T>",
+    create: {
+      description: "Insere um documento novo.",
+      type: "(document) => Promise<T & InternalDocumentFields>",
     },
     findOne: {
-      description: "Busca o primeiro documento correspondente.",
+      description: "Busca o primeiro documento correspondente ao filtro.",
       type: "(filter) => Promise<T | null>",
     },
     find: {
-      description: "Retorna vários documentos.",
+      description: "Retorna todos os documentos que correspondem ao filtro.",
       type: "(filter?) => Promise<T[]>",
     },
+    findOneByID: {
+      description: "Busca um documento pelo `_id`.",
+      type: "(id) => Promise<T | null>",
+    },
+    findOneById: {
+      description: "Alias de `findOneByID`.",
+      type: "(id) => Promise<T | null>",
+    },
     updateOne: {
-      description: "Atualiza um documento.",
-      type: "(filter, update) => Promise<boolean>",
+      description: "Atualiza o primeiro documento correspondente e retorna o documento atualizado.",
+      type: "(filter, update) => Promise<T | null>",
+    },
+    upsert: {
+      description: "Atualiza se encontrar, ou cria se não existir.",
+      type: "(filter, data) => Promise<T>",
+    },
+    paginate: {
+      description: "Retorna documentos paginados.",
+      type: "(options?) => Promise<PaginateResult<T>>",
     },
     deleteOne: {
-      description: "Remove um documento.",
+      description: "Remove o primeiro documento correspondente.",
       type: "(filter) => Promise<boolean>",
     },
     deleteMany: {
@@ -126,19 +128,11 @@ Após criar uma Collection você terá acesso aos principais métodos.
       type: "(filter?) => Promise<number>",
     },
     countDocuments: {
-      description: "Conta documentos da Collection.",
-      type: "() => Promise<number>",
-    },
-    exists: {
-      description: "Verifica se um documento existe.",
-      type: "(filter) => Promise<boolean>",
-    },
-    paginate: {
-      description: "Retorna documentos paginados.",
-      type: "(options) => Promise<PaginateResult<T>>",
+      description: "Conta quantos documentos existem na collection.",
+      type: "(filter?) => Promise<number>",
     },
     describeSchema: {
-      description: "Retorna informações do Schema da Collection.",
+      description: "Retorna um resumo amigável do schema da collection.",
       type: "() => SchemaDescription",
     },
   }}
@@ -149,7 +143,7 @@ Após criar uma Collection você terá acesso aos principais métodos.
 ## Exemplo
 
 ```ts
-const member = await database.members.insertOne({
+const member = await database.members.create({
   name: "Israel",
   email: "israel@gmail.com",
 });
@@ -157,7 +151,7 @@ const member = await database.members.insertOne({
 console.log(member);
 ```
 
-Buscar um documento.
+Buscar um documento:
 
 ```ts
 const member = await database.members.findOne({
@@ -165,20 +159,20 @@ const member = await database.members.findOne({
 });
 ```
 
-Atualizar.
+Atualizar:
 
 ```ts
-await database.members.updateOne(
+const updated = await database.members.updateOne(
   {
     email: "israel@gmail.com",
   },
   {
     name: "Israel Rabbi",
-  }
+  },
 );
 ```
 
-Remover.
+Remover:
 
 ```ts
 await database.members.deleteOne({
@@ -188,40 +182,7 @@ await database.members.deleteOne({
 
 ---
 
-## Índices
-
-Sempre que um campo possuir `unique: true`, a Collection criará automaticamente um índice.
-
-```ts
-const schema = new Schema({
-  email: {
-    type: String,
-    unique: true,
-  },
-});
-```
-
-Será criado:
-
-```text
-_collection_index_email.json
-```
-
-Exemplo:
-
-```json
-{
-  "israel@gmail.com": "6a3deee44f73903377c3cf0f"
-}
-```
-
-Esses índices permitem localizar documentos rapidamente e impedir valores duplicados.
-
----
-
 ## Descrevendo o Schema
-
-A Collection possui acesso direto às informações do Schema.
 
 ```ts
 console.log(database.members.describeSchema());
@@ -251,25 +212,19 @@ src/
 ├── database.ts
 ├── schemas/
 │   └── member.ts
-├── collections/
-│   └── member.ts
 └── index.ts
 ```
 
-Separar Schemas e Collections facilita a manutenção conforme o projeto cresce.
+Separar `schemas` e `database.ts` já resolve bem a maior parte dos projetos pequenos e médios.
 
 ---
 
 ## Próximo passo
 
-Agora que sua Collection está criada, você pode começar a inserir, consultar, atualizar e remover documentos.
+Agora que a collection está pronta, veja os métodos de inserção, consulta, atualização, remoção e paginação em detalhes.
 
 <Cards>
-  <Card
-    icon={<Table />}
-    title="CRUD"
-    href="/docs/database/crud"
-  >
-    Aprenda todas as operações disponíveis da Collection.
+  <Card icon={<Table />} title="CRUD" href="/docs/database/crud">
+    Veja como usar `create`, `find`, `updateOne`, `upsert`, `paginate` e mais.
   </Card>
 </Cards>

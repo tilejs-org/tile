@@ -1,6 +1,6 @@
 ---
 title: Database
-description: Crie e configure sua primeira Database
+description: Crie e configure sua instância principal do Tile.JS Database
 icon: Database
 ---
 
@@ -10,15 +10,20 @@ import { DatabaseIcon, TableProperties } from "lucide-react";
 
 # Database
 
-A classe `Database` é responsável por criar e gerenciar uma database do Tile.JS.
+A classe `Database` é a fachada principal da lib.
 
-Ela define onde os arquivos serão armazenados, o nome da database, o comportamento do logger e outras configurações globais.
+Ela é responsável por:
+
+- configurar o adapter padrão local
+- aceitar adapters customizados
+- criar e cachear collections
+- delegar `connect()` e `disconnect()` quando o adapter suporta lifecycle
 
 ---
 
-## Criando uma Database
+## Criando uma Database local
 
-A forma mais simples de criar uma database é utilizando todas as configurações padrão.
+A forma mais simples de uso continua sendo o adapter padrão local.
 
 ```ts title="src/index.ts"
 import { Database } from "@tile.js/database";
@@ -26,7 +31,7 @@ import { Database } from "@tile.js/database";
 const database = new Database();
 ```
 
-Por padrão, será criada uma database chamada **test**, armazenada em:
+Por padrão, isso cria uma database chamada `test`, armazenada em:
 
 ```text
 .tile/database/test
@@ -34,20 +39,15 @@ Por padrão, será criada uma database chamada **test**, armazenada em:
 
 ---
 
-## Configuração completa
-
-Todas as opções podem ser personalizadas.
+## Configuração completa do modo padrão
 
 ```ts title="src/index.ts"
 import { Database } from "@tile.js/database";
 
 const database = new Database({
   dbName: "my-database",
-
   storage: "workspace",
-
   compression: false,
-
   logger: {
     enabled: true,
     colors: true,
@@ -57,18 +57,44 @@ const database = new Database({
 
 ---
 
+## Usando um adapter customizado
+
+`storage` também pode receber um `StorageAdapter`.
+
+```ts title="src/index.ts"
+import { Database } from "@tile.js/database";
+import { mongodbAdapter } from "@tile.js/database/adapters/mongodb";
+import { MongoClient } from "mongodb";
+
+const client = new MongoClient("mongodb://127.0.0.1:27017");
+
+const database = new Database({
+  storage: mongodbAdapter(client, {
+    dbName: "my-database",
+  }),
+});
+```
+
+<Callout type="warning">
+Quando `storage` é um adapter customizado, `dbName` e `compression` deixam de ser válidos no `new Database(...)`.
+
+Essas opções devem ser configuradas dentro do próprio adapter.
+</Callout>
+
+---
+
 ## Opções
 
 <TypeTable
   type={{
     dbName: {
-      description: "Nome da database.",
+      description: "Nome da database usada pelo adapter padrão da lib.",
       type: "string",
       default: '"test"',
     },
     storage: {
-      description: "Local onde os arquivos serão armazenados.",
-      type: '"workspace" | "global"',
+      description: "Pode ser `workspace`, `global` ou um `StorageAdapter` customizado.",
+      type: '"workspace" | "global" | StorageAdapter',
       default: '"workspace"',
     },
     logger: {
@@ -77,7 +103,7 @@ const database = new Database({
       default: "{ enabled: false, colors: false }",
     },
     compression: {
-      description: "Compacta os arquivos BSON utilizando Gzip.",
+      description: "Compacta BSON com Gzip no adapter padrão.",
       type: "boolean",
       default: "false",
     },
@@ -86,11 +112,11 @@ const database = new Database({
 
 ---
 
-## Modos de armazenamento
+## Modos do adapter padrão
 
 ### Workspace
 
-Salva os dados dentro do projeto.
+Salva os dados dentro do diretório atual do projeto.
 
 ```text
 .tile/
@@ -98,7 +124,7 @@ Salva os dados dentro do projeto.
     └── test/
 ```
 
-Ideal para aplicações, APIs e projetos que mantêm seus dados junto ao código-fonte.
+Ideal para aplicações, APIs e projetos que mantêm seus dados junto do código-fonte.
 
 ---
 
@@ -112,37 +138,47 @@ Salva os dados no diretório do usuário.
     └── test/
 ```
 
-Esse modo é recomendado para CLIs e ferramentas utilizadas em diversos projetos.
+Útil para CLIs e ferramentas usadas em vários projetos.
 
 ---
 
-## Logger
+## Lifecycle
 
-O logger facilita o desenvolvimento exibindo informações importantes durante a execução.
+A classe `Database` expõe três métodos importantes:
 
 ```ts
-import { Database } from "@tile.js/database";
-
-const database = new Database({
-  logger: {
-    enabled: true,
-    colors: true,
-  },
-});
+await database.connect();
+console.log(database.isConnected()); // true
+await database.disconnect();
 ```
 
-Saída:
+No adapter padrão, `disconnect()` força `flush()` antes de encerrar.
 
-```bash
-[DEBUG] Database initialized
-[DEBUG] Collection "users" created
+Em adapters remotos, `connect()` e `disconnect()` delegam para o adapter quando o lifecycle é gerenciado por ele.
+
+---
+
+## Collections e cache
+
+A mesma collection não é recriada duas vezes.
+
+```ts
+const usersA = database.collection("users", userSchema);
+const usersB = database.model("users", userSchema);
+
+console.log(usersA === usersB); // true
+```
+
+Você também pode recuperar collections já registradas:
+
+```ts
+const users = database.getCollection("users");
+const usersAlias = database.getModel("users");
 ```
 
 ---
 
-## Estrutura criada
-
-A Database cria automaticamente toda a estrutura necessária.
+## Estrutura criada pelo adapter padrão
 
 <Files>
   <Folder name=".tile">
@@ -152,39 +188,27 @@ A Database cria automaticamente toda a estrutura necessária.
   </Folder>
 </Files>
 
-Você não precisa criar nenhuma pasta manualmente.
+Você não precisa criar nenhuma dessas pastas manualmente.
 
 ---
 
 ## Responsabilidades da Database
 
 <Cards cols={2}>
-  <Card
-    icon={<DatabaseIcon />}
-    title="Gerenciar Collections"
-  >
-    Todas as collections pertencem a uma Database.
+  <Card icon={<DatabaseIcon />} title="Collections">
+    Todas as collections pertencem a uma instância de `Database`.
   </Card>
 
-  <Card
-    icon={<DatabaseIcon />}
-    title="Armazenamento"
-  >
-    Define onde os arquivos da database serão salvos.
+  <Card icon={<DatabaseIcon />} title="Adapter">
+    Centraliza a configuração do backend de persistência.
   </Card>
 
-  <Card
-    icon={<DatabaseIcon />}
-    title="Logger"
-  >
-    Centraliza toda a configuração de logs.
+  <Card icon={<DatabaseIcon />} title="Logger">
+    Mantém toda a configuração de logs em um único lugar.
   </Card>
 
-  <Card
-    icon={<DatabaseIcon />}
-    title="Inicialização"
-  >
-    Cria automaticamente a estrutura necessária para funcionamento.
+  <Card icon={<DatabaseIcon />} title="Lifecycle">
+    Delegação de `connect()` e `disconnect()` para o backend quando suportado.
   </Card>
 </Cards>
 
@@ -192,14 +216,14 @@ Você não precisa criar nenhuma pasta manualmente.
 
 ## Próximo passo
 
-Agora que a Database foi criada, o próximo passo é definir a estrutura dos documentos utilizando um Schema.
+Agora que a instância principal foi criada, o próximo passo é escolher o backend e depois definir o schema das collections.
 
 <Cards>
-  <Card
-    icon={<TableProperties />}
-    title="Schema"
-    href="/docs/database/schema"
-  >
-    Aprenda a criar schemas, definir tipos, índices e validações.
+  <Card icon={<DatabaseIcon />} title="Adapters" href="/docs/database/adapters">
+    Entenda o adapter padrão, MongoDB e Mongoose.
+  </Card>
+
+  <Card icon={<TableProperties />} title="Schema" href="/docs/database/schema">
+    Aprenda a definir tipos, defaults, índices e validações.
   </Card>
 </Cards>

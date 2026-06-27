@@ -74,7 +74,9 @@ export class Validator {
       | typeof String
       | typeof Number
       | typeof Boolean
-      | typeof Date,
+      | typeof Date
+      | typeof Array
+      | typeof Object,
     fieldName?: string,
   ): void {
     if (!expectedType) return;
@@ -99,12 +101,25 @@ export class Validator {
         throw new Error(`Field "${fieldName}" must be an array`);
       }
     } else if (typeString === "Date") {
-      if (
-        !(value instanceof Date) &&
-        typeof value !== "string" &&
-        typeof value !== "number"
-      ) {
-        throw new Error(`Field "${fieldName}" must be a Date`);
+      if (value instanceof Date) {
+        if (Number.isNaN(value.getTime())) {
+          throw new Error(`Field "${fieldName}" must be a valid Date`);
+        }
+        return;
+      }
+
+      if (typeof value === "string" || typeof value === "number") {
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) {
+          throw new Error(`Field "${fieldName}" must be a valid Date`);
+        }
+        return;
+      }
+
+      throw new Error(`Field "${fieldName}" must be a Date`);
+    } else if (typeString === "Object") {
+      if (actualType !== "object" || isArray || value instanceof Date) {
+        throw new Error(`Field "${fieldName}" must be of type Object`);
       }
     } else {
       const validTypes = typeMap[typeString] || [];
@@ -120,13 +135,17 @@ export class Validator {
       | typeof String
       | typeof Number
       | typeof Boolean
-      | typeof Date,
+      | typeof Date
+      | typeof Array
+      | typeof Object,
   ): FieldType {
     if (typeof type === "function") {
       if (type === String) return "String";
       if (type === Number) return "Number";
       if (type === Boolean) return "Boolean";
       if (type === Date) return "Date";
+      if (type === Array) return "Array";
+      if (type === Object) return "Object";
     }
     return type as FieldType;
   }

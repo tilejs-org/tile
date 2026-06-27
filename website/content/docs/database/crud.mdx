@@ -9,15 +9,17 @@ import { SquarePen } from "lucide-react";
 
 # CRUD
 
-Após criar uma Collection, você pode começar a inserir, consultar, atualizar e remover documentos.
+Após criar uma collection, você pode inserir, consultar, atualizar e remover documentos.
 
 Todos os métodos são assíncronos e retornam uma `Promise`.
 
+<Callout type="info">
+Os filtros são simples e baseados em igualdade rasa entre campos e valores.
+</Callout>
+
 ---
 
-## Documento de exemplo
-
-Nos exemplos desta página será utilizada a seguinte Collection.
+## Collection de exemplo
 
 ```ts title="database.ts"
 import { Database, Schema } from "@tile.js/database";
@@ -28,6 +30,7 @@ interface Member {
   email: string;
   age?: number;
   verified?: boolean;
+  note?: string;
 }
 
 const memberSchema = new Schema<Member>({
@@ -35,18 +38,17 @@ const memberSchema = new Schema<Member>({
     type: String,
     required: true,
   },
-
   email: {
     type: String,
     unique: true,
+    lowercase: true,
   },
-
   age: Number,
-
   verified: {
     type: Boolean,
     default: false,
   },
+  note: String,
 });
 
 const connection = new Database();
@@ -60,14 +62,14 @@ export const database = Object.assign(connection, {
 
 # Inserindo documentos
 
-## insertOne()
+## create()
 
 Insere um único documento.
 
 ```ts
-const member = await database.members.insertOne({
+const member = await database.members.create({
   name: "Israel",
-  email: "israel@gmail.com",
+  email: "ISRAEL@GMAIL.COM",
   age: 21,
 });
 
@@ -115,7 +117,7 @@ const members = await database.members.find({
 });
 ```
 
-Também é possível buscar todos os documentos.
+Também é possível buscar todos os documentos:
 
 ```ts
 const members = await database.members.find();
@@ -123,30 +125,36 @@ const members = await database.members.find();
 
 ---
 
-## exists()
+## findOneByID() / findOneById()
 
-Verifica se um documento existe.
+Buscam um documento pelo `_id`.
 
 ```ts
-const exists = await database.members.exists({
-  email: "israel@gmail.com",
-});
+const member = await database.members.findOneByID("68526dba05db8ec36dcb33d8");
 ```
 
-Retorno:
+Alias:
 
 ```ts
-true
+const member = await database.members.findOneById("68526dba05db8ec36dcb33d8");
 ```
 
 ---
 
 ## countDocuments()
 
-Conta quantos documentos existem na Collection.
+Conta quantos documentos existem na collection.
 
 ```ts
 const total = await database.members.countDocuments();
+```
+
+Com filtro:
+
+```ts
+const verifiedTotal = await database.members.countDocuments({
+  verified: true,
+});
 ```
 
 ---
@@ -155,37 +163,54 @@ const total = await database.members.countDocuments();
 
 ## updateOne()
 
-Atualiza o primeiro documento encontrado.
+Atualiza o primeiro documento correspondente e retorna o documento atualizado.
 
 ```ts
-await database.members.updateOne(
+const updated = await database.members.updateOne(
   {
     email: "israel@gmail.com",
   },
   {
     verified: true,
-  }
+  },
 );
 ```
 
 Também é possível utilizar operadores.
 
 ```ts
-await database.members.updateOne(
+const updated = await database.members.updateOne(
   {
     email: "israel@gmail.com",
   },
   {
     $set: {
       verified: true,
+      name: "Israel Rabbi",
     },
-
     $inc: {
       age: 1,
     },
-
     $unset: ["note"],
-  }
+  },
+);
+```
+
+---
+
+## upsert()
+
+Atualiza o primeiro documento encontrado ou cria um novo quando nada é encontrado.
+
+```ts
+const member = await database.members.upsert(
+  {
+    email: "israel@gmail.com",
+  },
+  {
+    name: "Israel",
+    verified: true,
+  },
 );
 ```
 
@@ -208,7 +233,7 @@ await database.members.updateOne(
       type: "string[] | Record<string, boolean>",
     },
     $delete: {
-      description: "Alias para $unset.",
+      description: "Alias para `$unset`.",
       type: "string[] | Record<string, boolean>",
     },
   }}
@@ -240,7 +265,7 @@ await database.members.deleteMany({
 });
 ```
 
-Remover todos.
+Remover todos:
 
 ```ts
 await database.members.deleteMany();
@@ -261,13 +286,12 @@ const result = await database.members.paginate({
 });
 ```
 
-Também é possível ordenar.
+Também é possível ordenar:
 
 ```ts
 const result = await database.members.paginate({
   page: 1,
   limit: 10,
-
   sort: {
     createdAt: "desc",
   },
@@ -288,86 +312,56 @@ Retorno:
 
 ---
 
-# Descrevendo o Schema
-
-A Collection pode retornar informações do Schema.
-
-```ts
-console.log(database.members.describeSchema());
-```
-
-Resultado:
-
-```ts
-{
-  fields: {
-    _id: {...},
-    name: {...},
-    email: {...},
-    age: {...},
-    verified: {...},
-    __v: {...}
-  },
-
-  timestamps: true,
-
-  collection: undefined
-}
-```
-
----
-
 # Resumo dos métodos
 
 <TypeTable
   type={{
-    insertOne: {
+    create: {
       description: "Insere um documento.",
       type: "Promise<T>",
     },
-
     findOne: {
-      description: "Busca um documento.",
+      description: "Busca um documento pelo filtro.",
       type: "Promise<T | null>",
     },
-
     find: {
       description: "Busca vários documentos.",
       type: "Promise<T[]>",
     },
-
-    exists: {
-      description: "Verifica existência.",
-      type: "Promise<boolean>",
+    findOneByID: {
+      description: "Busca por `_id`.",
+      type: "Promise<T | null>",
     },
-
+    findOneById: {
+      description: "Alias de `findOneByID`.",
+      type: "Promise<T | null>",
+    },
     countDocuments: {
       description: "Conta documentos.",
       type: "Promise<number>",
     },
-
     updateOne: {
-      description: "Atualiza um documento.",
-      type: "Promise<boolean>",
+      description: "Atualiza um documento e retorna o resultado.",
+      type: "Promise<T | null>",
     },
-
+    upsert: {
+      description: "Atualiza ou cria um documento.",
+      type: "Promise<T>",
+    },
     deleteOne: {
       description: "Remove um documento.",
       type: "Promise<boolean>",
     },
-
     deleteMany: {
       description: "Remove vários documentos.",
       type: "Promise<number>",
     },
-
     paginate: {
       description: "Retorna documentos paginados.",
       type: "Promise<PaginateResult<T>>",
     },
-
     describeSchema: {
-      description: "Retorna informações do Schema.",
+      description: "Retorna informações do schema.",
       type: "SchemaDescription",
     },
   }}
@@ -377,8 +371,8 @@ Resultado:
 
 ## Próximos passos
 
-Agora você já conhece todas as operações básicas disponíveis no Tile.JS Database.
+Agora você já conhece as operações principais disponíveis no Tile.JS Database.
 
 <Callout type="tip">
-Consulte a documentação do <code>Schema</code> para conhecer todas as validações, índices e opções disponíveis para os campos.
+Consulte a documentação de <code>Schema</code> e <code>Adapters</code> para entender melhor como validação, índices e persistência interagem entre si.
 </Callout>

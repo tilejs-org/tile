@@ -1,3 +1,3 @@
-import { HelloWorld } from "../dist";
+import { HelloWorld } from "../dist/index.js";
 
 HelloWorld("Tile.js");

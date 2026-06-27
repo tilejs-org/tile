@@ -1,6 +1,6 @@
 {
   "name": "@tile.js/database",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "homepage": "https://tile.js.org/",
   "license": "MIT",
   "type": "module",
@@ -37,6 +37,22 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./adapters": {
+      "types": "./dist/adapters/index.d.ts",
+      "import": "./dist/adapters/index.js"
+    },
+    "./adapters/default": {
+      "types": "./dist/adapters/default/index.d.ts",
+      "import": "./dist/adapters/default/index.js"
+    },
+    "./adapters/mongodb": {
+      "types": "./dist/adapters/mongodb/index.d.ts",
+      "import": "./dist/adapters/mongodb/index.js"
+    },
+    "./adapters/mongoose": {
+      "types": "./dist/adapters/mongoose/index.d.ts",
+      "import": "./dist/adapters/mongoose/index.js"
     }
   },
   "files": [
@@ -53,6 +69,7 @@
   "scripts": {
     "typegen": "tsc",
     "build": "bun run ./build.ts",
+    "test": "bun run build && node --test ./tests/*.test.mjs",
     "dev": "bun run ./playground/index.ts"
   }
 }

@@ -1,0 +1,213 @@
+---
+title: Adapters
+description: Escolha entre o backend local padrão, MongoDB ou Mongoose
+icon: Boxes
+---
+
+import { Tab, Tabs } from "fumadocs-ui/components/tabs";
+import { TypeTable } from "fumadocs-ui/components/type-table";
+import { BoxesIcon } from "lucide-react";
+
+# Adapters
+
+A lib expõe um sistema de adapters para separar a semântica principal do backend de persistência.
+
+Isso significa que:
+
+- o `Schema`, `Model` e a API pública continuam sendo do **@tile.js/database**
+- o backend pode ser local, MongoDB ou Mongoose
+- o contrato usado pelo core é `StorageAdapter`
+
+---
+
+## Adapters disponíveis
+
+<Tabs items={["default", "mongodb", "mongoose"]}>
+  <Tab value="default">
+
+O adapter padrão local já é usado automaticamente quando você não passa um adapter customizado.
+
+```ts
+import { Database } from "@tile.js/database";
+
+const database = new Database({
+  dbName: "app",
+});
+```
+
+Se quiser usá-lo explicitamente:
+
+```ts
+import { Database } from "@tile.js/database";
+import { defaultAdapter } from "@tile.js/database/adapters/default";
+
+const database = new Database({
+  storage: defaultAdapter({
+    dbName: "app",
+    storage: "workspace",
+    compression: false,
+  }),
+});
+```
+
+<TypeTable
+  type={{
+    dbName: {
+      description: "Nome da database local.",
+      type: "string",
+    },
+    storage: {
+      description: "Local onde os dados serão armazenados no adapter padrão.",
+      type: '"workspace" | "global"',
+      default: '"workspace"',
+    },
+    compression: {
+      description: "Compacta os arquivos BSON com Gzip.",
+      type: "boolean",
+      default: "false",
+    },
+  }}
+/>
+
+  </Tab>
+
+  <Tab value="mongodb">
+
+O adapter de MongoDB usa um `MongoClient` fornecido pelo projeto consumidor.
+
+```ts
+import { Database } from "@tile.js/database";
+import { mongodbAdapter } from "@tile.js/database/adapters/mongodb";
+import { MongoClient } from "mongodb";
+
+const client = new MongoClient("mongodb://127.0.0.1:27017");
+
+const database = new Database({
+  storage: mongodbAdapter(client, {
+    dbName: "app",
+  }),
+});
+```
+
+<TypeTable
+  type={{
+    dbName: {
+      description: "Nome da database selecionada no client.",
+      type: "string",
+    },
+    persistSchema: {
+      description: "Persiste o resultado de `schema.describe()` em uma collection interna.",
+      type: "boolean",
+      default: "true",
+    },
+    schemaCollection: {
+      description: "Nome da collection usada para persistir metadados de schema.",
+      type: "string",
+      default: '"_tile_schemas"',
+    },
+    manageClient: {
+      description: "Controla se `database.connect()` e `database.disconnect()` chamam `client.connect()` e `client.close()`.",
+      type: "boolean",
+      default: "true",
+    },
+  }}
+/>
+
+  </Tab>
+
+  <Tab value="mongoose">
+
+O adapter de Mongoose aceita uma instância `mongoose` ou uma `Connection`.
+
+```ts
+import mongoose from "mongoose";
+import { Database } from "@tile.js/database";
+import { mongooseAdapter } from "@tile.js/database/adapters/mongoose";
+
+const database = new Database({
+  storage: mongooseAdapter(mongoose, {
+    uri: "mongodb://127.0.0.1:27017",
+    dbName: "app",
+  }),
+});
+```
+
+<TypeTable
+  type={{
+    dbName: {
+      description: "Nome da database usada pela connection selecionada.",
+      type: "string",
+    },
+    uri: {
+      description: "URI utilizada quando o adapter gerencia a conexão.",
+      type: "string",
+    },
+    connectOptions: {
+      description: "Opções repassadas para `mongoose.connect()` ou `connection.openUri()`.",
+      type: "Record<string, any>",
+    },
+    persistSchema: {
+      description: "Persiste o schema descrito em uma collection interna.",
+      type: "boolean",
+      default: "true",
+    },
+    schemaCollection: {
+      description: "Nome da collection usada para metadados de schema.",
+      type: "string",
+      default: '"_tile_schemas"',
+    },
+    manageConnection: {
+      description: "Controla se `database.connect()` e `database.disconnect()` gerenciam a conexão do Mongoose.",
+      type: "boolean",
+      default: "true",
+    },
+  }}
+/>
+
+  </Tab>
+</Tabs>
+
+---
+
+## Regras importantes
+
+<Callout type="warning">
+Quando `storage` recebe um adapter customizado, você **não deve** passar `dbName` nem `compression` no `new Database(...)`.
+</Callout>
+
+```ts
+new Database({
+  storage: mongodbAdapter(client, {
+    dbName: "app",
+  }),
+});
+```
+
+---
+
+## O que continua igual entre adapters
+
+Mesmo trocando o backend, a semântica principal da lib continua vindo do core:
+
+- defaults
+- `_id`
+- `__v`
+- `timestamps`
+- `trim` / `lowercase`
+- validação de schema
+- operadores de `updateOne()`
+- `paginate()`
+
+Em outras palavras, os adapters trocam o backend de persistência, mas não transformam a lib em um ODM nativo de MongoDB/Mongoose.
+
+---
+
+## Próximo passo
+
+Depois de escolher o backend, defina o schema dos seus documentos e registre collections na instância principal.
+
+<Cards>
+  <Card icon={<BoxesIcon />} title="Schema" href="/docs/database/schema">
+    Defina campos, defaults, validações e índices.
+  </Card>
+</Cards>

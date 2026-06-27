@@ -10,7 +10,13 @@ import {
 import Link from "fumadocs-core/link";
 import Image from "next/image";
 import Preview from "../../../public/images/package_database.png";
-import { Book, DatabaseIcon, Pencil, RocketIcon, Server } from "lucide-react";
+import {
+  Book,
+  Boxes,
+  DatabaseIcon,
+  RocketIcon,
+  Server,
+} from "lucide-react";
 
 import type { Metadata } from "next";
 
@@ -69,12 +75,32 @@ export default function Layout({ children }: LayoutProps<"/">) {
         {
           type: "menu",
           on: "menu",
-          text: "Documentation",
+          text: "Documentação",
           items: [
             {
-              text: "Documentação",
+              text: "Visão geral",
               url: "/docs",
               icon: <Book />,
+            },
+            {
+              text: "Get started",
+              url: "/docs/database/get-started",
+              icon: <DatabaseIcon />,
+            },
+            {
+              text: "Instalação",
+              url: "/docs/database/installation",
+              icon: <Server />,
+            },
+            {
+              text: "Adapters",
+              url: "/docs/database/adapters",
+              icon: <Boxes />,
+            },
+            {
+              text: "CRUD",
+              url: "/docs/database/crud",
+              icon: <RocketIcon />,
             },
           ],
         },
@@ -97,7 +123,7 @@ export default function Layout({ children }: LayoutProps<"/">) {
                   <div className="-mx-3 -mt-3">
                     <Image
                       src={Preview}
-                      alt="Preview do Tile.JS"
+                      alt="Preview da documentação do Tile.JS Database"
                       className="rounded-t-lg object-cover"
                       style={{
                         maskImage:
@@ -106,10 +132,10 @@ export default function Layout({ children }: LayoutProps<"/">) {
                     />
                   </div>
 
-                  <p className="font-medium">Introdução</p>
+                  <p className="font-medium">Comece pela documentação</p>
                   <p className="text-fd-muted-foreground text-sm">
-                    Conheça o Tile.JS, explore seus pacotes e descubra como criar
-                    aplicações modernas utilizando TypeScript e Bun.
+                    Explore o Tile.JS e comece pela área mais madura do projeto:
+                    a documentação do @tile.js/database.
                   </p>
                 </NavbarMenuLink>
                 <NavbarMenuLink
@@ -118,10 +144,10 @@ export default function Layout({ children }: LayoutProps<"/">) {
                 >
                   <DatabaseIcon className="bg-fd-info/50 text-fd-primary-foreground mb-2 rounded-md p-1" />
 
-                  <p className="font-medium">Database</p>
+                  <p className="font-medium">Get started</p>
                   <p className="text-fd-muted-foreground text-sm">
-                    Banco de dados local tipado com schemas, coleções e
-                    persistência para aplicações rápidas e escaláveis.
+                    Entenda a proposta da lib e faça o primeiro setup em poucos
+                    minutos.
                   </p>
                 </NavbarMenuLink>
                 <NavbarMenuLink
@@ -132,18 +158,20 @@ export default function Layout({ children }: LayoutProps<"/">) {
 
                   <p className="font-medium">Instalação</p>
                   <p className="text-fd-muted-foreground text-sm">
-                    Instale o Tile.JS Database no seu projeto
+                    Instale o pacote principal e veja quando adicionar adapters
+                    opcionais.
                   </p>
                 </NavbarMenuLink>
                 <NavbarMenuLink
-                  href="/docs/database/collections"
+                  href="/docs/database/adapters"
                   className="lg:col-start-3 lg:row-start-1"
                 >
-                  <Pencil className="bg-fd-info/50 text-fd-primary-foreground mb-2 rounded-md p-1" />
+                  <Boxes className="bg-fd-info/50 text-fd-primary-foreground mb-2 rounded-md p-1" />
 
-                  <p className="font-medium">Collections</p>
+                  <p className="font-medium">Adapters</p>
                   <p className="text-fd-muted-foreground text-sm">
-                    Crie e gerencie Collections utilizando Schemas
+                    Compare o adapter padrão, MongoDB e Mongoose no mesmo fluxo
+                    de uso.
                   </p>
                 </NavbarMenuLink>
                 <NavbarMenuLink
@@ -154,15 +182,14 @@ export default function Layout({ children }: LayoutProps<"/">) {
 
                   <p className="font-medium">CRUD</p>
                   <p className="text-fd-muted-foreground text-sm">
-                    Explore um projeto completo utilizando os principais
-                    recursos do Tile.JS como ponto de partida.
+                    Veja a API real da collection com create, find, updateOne,
+                    upsert, paginate e mais.
                   </p>
                 </NavbarMenuLink>
               </NavbarMenuContent>
             </NavbarMenu>
           ),
         },
-        // ...linkItems,
       ]}
       className="dark:bg-neutral-950 dark:[--color-fd-background:var(--color-neutral-950)] [--color-fd-primary:var(--color-brand)]"
     >

@@ -15,14 +15,18 @@ import {
 import { existsSync } from "node:fs";
 import { join, relative } from "node:path";
 import { homedir } from "node:os";
-import type { SchemaDescription } from "../core/types.js";
+import type {
+  PrepareCollectionOptions,
+  StorageAdapter,
+} from "../types.js";
+import type { SchemaDescription } from "../../core/types.js";
 
 /**
  * Minimal contract for a storage backend.
  *
  * @example
  * ```ts
- * const storage: StorageEngine = new BsonStorageEngine({ dbName: "app" });
+ * const storage: StorageEngine = new DefaultStorageAdapter({ dbName: "app" });
  * ```
  */
 export interface StorageEngine {
@@ -32,9 +36,9 @@ export interface StorageEngine {
 }
 
 /**
- * Configuration for the BSON storage engine.
+ * Configuration for the default local adapter.
  */
-export interface BsonStorageConfig {
+export interface DefaultStorageConfig {
   dbName: string;
   storage?: "workspace" | "global";
   compression?: boolean;
@@ -66,11 +70,11 @@ type CollectionState = {
  *
  * @example
  * ```ts
- * const storage = new BsonStorageEngine({ dbName: "app" });
+ * const storage = new DefaultStorageAdapter({ dbName: "app" });
  * await storage.write("users", id, data);
  * ```
  */
-export class BsonStorageEngine implements StorageEngine {
+export class DefaultStorageAdapter implements StorageEngine, StorageAdapter {
   private readonly dbName: string;
   private readonly rootPath: string;
   private readonly legacyRootPath: string;
@@ -81,14 +85,14 @@ export class BsonStorageEngine implements StorageEngine {
   private flushTimer: ReturnType<typeof setTimeout> | null = null;
   private flushPromise: Promise<void> | null = null;
 
-  private static instances = new Set<BsonStorageEngine>();
+  private static instances = new Set<DefaultStorageAdapter>();
   private static hooksRegistered = false;
 
   /**
    * Creates a storage engine rooted at `.tile/database/<dbName>`.
    * Collection data and schema metadata stay under `<collection>/`.
    */
-  constructor(config: BsonStorageConfig) {
+  constructor(config: DefaultStorageConfig) {
     this.dbName = config.dbName;
     this.compression = config.compression ?? false;
 
@@ -102,20 +106,20 @@ export class BsonStorageEngine implements StorageEngine {
   }
 
   private registerInstance(): void {
-    BsonStorageEngine.instances.add(this);
-    BsonStorageEngine.registerShutdownHooks();
+    DefaultStorageAdapter.instances.add(this);
+    DefaultStorageAdapter.registerShutdownHooks();
   }
 
   private static registerShutdownHooks(): void {
-    if (BsonStorageEngine.hooksRegistered) {
+    if (DefaultStorageAdapter.hooksRegistered) {
       return;
     }
 
-    BsonStorageEngine.hooksRegistered = true;
+    DefaultStorageAdapter.hooksRegistered = true;
 
     const flushAll = async (): Promise<void> => {
       await Promise.all(
-        Array.from(BsonStorageEngine.instances).map((instance) =>
+        Array.from(DefaultStorageAdapter.instances).map((instance) =>
           instance.flush(),
         ),
       );
@@ -222,8 +226,9 @@ export class BsonStorageEngine implements StorageEngine {
    */
   async prepareCollection(
     collection: string,
-    uniqueFields: string[] = [],
+    options: PrepareCollectionOptions = {},
   ): Promise<void> {
+    const uniqueFields = options.uniqueFields ?? [];
     const state = this.getOrCreateCollectionState(collection, uniqueFields);
 
     if (!state.initialized) {
@@ -237,11 +242,14 @@ export class BsonStorageEngine implements StorageEngine {
 
       await state.initializing;
       state.initializing = undefined;
-      return;
+    } else {
+      for (const field of uniqueFields) {
+        await this.ensureIndexForField(collection, state, field);
+      }
     }
 
-    for (const field of uniqueFields) {
-      await this.ensureIndexForField(collection, state, field);
+    if (options.schema) {
+      await this.writeCollectionSchema(collection, options.schema);
     }
   }
 
@@ -251,8 +259,8 @@ export class BsonStorageEngine implements StorageEngine {
   ): Promise<void> {
     await mkdir(this.getCollectionPath(collection), { recursive: true });
 
-    await this.migrateLegacyCollection(collection);
     await this.migrateLegacyDocuments(collection);
+    await this.migrateLegacyCollection(collection);
     await this.cleanupSchemaArtifacts(collection);
 
     for (const field of state.uniqueFields) {
@@ -547,17 +555,25 @@ export class BsonStorageEngine implements StorageEngine {
       return bsonDocument;
     }
 
-    const legacyPath = this.getLegacyDocumentPath(collection, id);
-    if (!existsSync(legacyPath)) {
-      return null;
+    const candidateJsonPaths = [
+      join(this.getCollectionPath(collection), `${id}.json`),
+      this.getLegacyDocumentPath(collection, id),
+    ];
+
+    for (const candidatePath of candidateJsonPaths) {
+      if (!existsSync(candidatePath)) {
+        continue;
+      }
+
+      try {
+        const raw = await readFile(candidatePath, "utf8");
+        return JSON.parse(raw);
+      } catch {
+        // Try the next candidate path.
+      }
     }
 
-    try {
-      const raw = await readFile(legacyPath, "utf8");
-      return JSON.parse(raw);
-    } catch {
-      return null;
-    }
+    return null;
   }
 
   private async listCommittedDocuments(collection: string): Promise<any[]> {
@@ -904,6 +920,20 @@ export class BsonStorageEngine implements StorageEngine {
 }
 
 /**
- * Backwards-compatible alias for the current storage engine.
+ * Creates the default local adapter used by `@tile.js/database`.
  */
-export class FileSystem extends BsonStorageEngine {}
+export function defaultAdapter(
+  config: DefaultStorageConfig,
+): DefaultStorageAdapter {
+  return new DefaultStorageAdapter(config);
+}
+
+/**
+ * Backwards-compatible type alias for older BSON-focused naming.
+ */
+export type BsonStorageConfig = DefaultStorageConfig;
+
+/**
+ * Backwards-compatible alias for the previous storage engine name.
+ */
+export class BsonStorageEngine extends DefaultStorageAdapter {}

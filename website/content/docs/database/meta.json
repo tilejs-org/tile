@@ -4,6 +4,7 @@
     "get-started",
     "installation",
     "database",
+    "adapters",
     "schema",
     "collections",
     "crud"

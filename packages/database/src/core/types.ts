@@ -1,3 +1,5 @@
+import type { StorageAdapter } from "../adapters/types.js";
+
 /**
  * Built-in field types supported by `Schema`.
  *
@@ -210,7 +212,7 @@ export interface PaginateResult<T> {
  *
  * @example
  * ```ts
- * const db = Tile({ logger: { enabled: true, colors: true } });
+ * const db = new Database({ logger: { enabled: true, colors: true } });
  * ```
  */
 export interface LoggerConfig {
@@ -218,33 +220,33 @@ export interface LoggerConfig {
   colors?: boolean;
 }
 
-/**
- * Database configuration for `Tile`.
- *
- * @example
- * ```ts
- * const db = Tile({
- *   dbName: "app",
- *   storage: "workspace",
- *   compression: false,
- * });
- * ```
- */
-export interface TileConfig {
+export interface BaseDatabaseConfig {
   /**
-   * Define o nome da database.
+   * Define se aparece ou não os logs.
+   *
+   * @default enabled: false, colors: false
+   */
+  logger?: LoggerConfig;
+}
+
+/**
+ * Configuration for the default adapter used by the library.
+ */
+export interface DefaultDatabaseConfig extends BaseDatabaseConfig {
+  /**
+   * Define o nome da database usada pelo adapter default da lib.
    *
    * @default "test"
    */
   dbName?: string;
 
   /**
-   * Define onde os dados serão armazenados.
+   * Define onde os dados serão armazenados pelo adapter default.
    *
    * - "workspace": salva em `.tile/database/` na raiz do workspace/projeto.
    * - "global": salva em `~/.tile/database/`, tornando-os disponíveis globalmente para o usuário da máquina.
    *
-   * Estrutura resultante:
+   * Estrutura do adapter default:
    * - documentos: `.tile/database/<dbName>/<collection>/*.bson`
    * - metadados de schema: `.tile/database/<dbName>/<collection>/_schema.json`
    *
@@ -253,19 +255,46 @@ export interface TileConfig {
   storage?: "workspace" | "global";
 
   /**
-   * Define se aparece ou não os logs.
-   *
-   * @default enabled: false, colors: false
-   */
-  logger?: LoggerConfig;
-
-  /**
-   * Habilita gzip no pipeline BSON.
+   * Habilita gzip no pipeline BSON do adapter default.
    *
    * @default false
    */
   compression?: boolean;
 }
+
+/**
+ * Configuration for custom storage adapters.
+ *
+ * When `storage` is a custom adapter, persistence-specific fields such as
+ * `dbName` and `compression` must be configured inside the adapter itself.
+ */
+export interface AdapterDatabaseConfig extends BaseDatabaseConfig {
+  /**
+   * Adapter customizado responsável por toda a persistência.
+   */
+  storage: StorageAdapter;
+  dbName?: never;
+  compression?: never;
+}
+
+/**
+ * Database configuration.
+ *
+ * @example
+ * ```ts
+ * const db = new Database({
+ *   dbName: "app",
+ *   storage: "workspace",
+ *   compression: false,
+ * });
+ * ```
+ */
+export type DatabaseConfig = DefaultDatabaseConfig | AdapterDatabaseConfig;
+
+/**
+ * Backwards-compatible alias kept for existing consumers.
+ */
+export type TileConfig = DatabaseConfig;
 
 /**
  * Basic predicate used by validators.

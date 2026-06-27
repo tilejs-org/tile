@@ -10,14 +10,14 @@ import { RocketIcon, DatabaseIcon, BoxesIcon, FileCodeIcon } from "lucide-react"
 
 # Bem-vindo
 
-O **@tile.js/database** é um banco de dados local, tipado e baseado em schemas para aplicações Node.js e Bun.
+O **@tile.js/database** é uma camada de persistência tipada para aplicações **Node.js** e **Bun**.
 
-Ele foi desenvolvido para oferecer uma API simples, forte integração com TypeScript e armazenamento em arquivos BSON, sem depender de um servidor externo.
+A lib continua com o adapter local padrão em BSON, mas também suporta adapters externos para **MongoDB** e **Mongoose**.
 
 <Callout type="info">
 Se esta é sua primeira vez utilizando o Tile.JS Database, siga esta ordem de leitura:
 
-**Instalação → Database → Schema → Collections → CRUD**
+**Instalação → Database → Adapters → Schema → Collections → CRUD**
 </Callout>
 
 ---
@@ -26,19 +26,19 @@ Se esta é sua primeira vez utilizando o Tile.JS Database, siga esta ordem de le
 
 <Cards cols={2}>
   <Card title="100% TypeScript">
-    Schemas totalmente tipados com autocompletar.
+    Schemas tipados com boa integração com autocompletar e inferência.
   </Card>
 
-  <Card title="Sem servidor">
-    Armazena todos os dados localmente em arquivos BSON.
+  <Card title="Adapter padrão local">
+    Armazena documentos em BSON dentro da pasta `.tile/database`.
   </Card>
 
-  <Card title="Schemas">
-    Validação, índices e configurações em um único lugar.
+  <Card title="Adapters externos">
+    Integrações para MongoDB e Mongoose sem dependências internas obrigatórias.
   </Card>
 
-  <Card title="Leve">
-    Ideal para CLIs, bots, APIs e aplicações locais.
+  <Card title="API simples">
+    Collections com CRUD assíncrono, paginação, upsert e introspecção de schema.
   </Card>
 </Cards>
 
@@ -52,29 +52,36 @@ import { Database, Schema } from "@tile.js/database";
 interface Member {
   _id?: string;
   email: string;
+  name: string;
 }
 
 const memberSchema = new Schema<Member>({
-  _id: { type: String },
-  email: { type: String, unique: true },
+  email: { type: String, required: true, unique: true, lowercase: true },
+  name: { type: String, required: true, trim: true },
 });
 
 const connection = new Database({
-  logger: {
-    enabled: true,
-    colors: true,
-  },
+  dbName: "example-project",
 });
 
-const database = Object.assign(connection, {
+export const database = Object.assign(connection, {
   members: connection.collection<Member>("members", memberSchema),
 });
 
-console.log(database.members.describeSchema());
+await database.connect();
+
+const member = await database.members.create({
+  email: "ISRAEL@GMAIL.COM",
+  name: " Israel ",
+});
+
+console.log(member);
+
+await database.disconnect();
 ```
 
 <Callout type="tip">
-Na primeira execução, o banco cria automaticamente a estrutura de diretórios, os índices e o schema da coleção.
+No modo padrão, a estrutura de diretórios, os índices e o `_schema.json` são criados automaticamente na primeira utilização da collection.
 </Callout>
 
 ---
@@ -84,13 +91,13 @@ Na primeira execução, o banco cria automaticamente a estrutura de diretórios,
 <TypeTable
   type={{
     dbName: {
-      description: "Nome da database.",
+      description: "Nome da database usada pelo adapter padrão da lib.",
       type: "string",
       default: '"test"',
     },
     storage: {
-      description: "Define onde os arquivos serão armazenados.",
-      type: '"workspace" | "global"',
+      description: "Pode ser o modo local (`workspace` ou `global`) ou um adapter customizado.",
+      type: '"workspace" | "global" | StorageAdapter',
       default: '"workspace"',
     },
     logger: {
@@ -99,18 +106,22 @@ Na primeira execução, o banco cria automaticamente a estrutura de diretórios,
       default: "{ enabled: false, colors: false }",
     },
     compression: {
-      description: "Compacta os arquivos BSON utilizando Gzip.",
+      description: "Compacta os arquivos BSON com Gzip no adapter padrão.",
       type: "boolean",
       default: "false",
     },
   }}
 />
 
+<Callout type="warning">
+Quando `storage` recebe um adapter customizado, opções como `dbName` e `compression` deixam de ser válidas no `new Database(...)` e devem ser configuradas no próprio adapter.
+</Callout>
+
 ---
 
-## Estrutura criada
+## Estrutura criada pelo adapter padrão
 
-Após criar a primeira coleção, a estrutura do projeto ficará semelhante a esta:
+Após criar a primeira collection local, a estrutura do projeto ficará semelhante a esta:
 
 <Files>
   <Folder name=".tile">
@@ -120,6 +131,7 @@ Após criar a primeira coleção, a estrutura do projeto ficará semelhante a es
           <File name="_collection_index_id.json" />
           <File name="_collection_index_email.json" />
           <File name="_schema.json" />
+          <File name="*.bson" />
         </Folder>
       </Folder>
     </Folder>
@@ -134,73 +146,8 @@ Após criar a primeira coleção, a estrutura do projeto ficará semelhante a es
 </Files>
 
 <Callout type="info">
-A pasta <code>.tile</code> contém todos os arquivos da database e é criada automaticamente. Não é necessário criar ou editar esses arquivos manualmente.
+A pasta <code>.tile</code> só existe para o adapter padrão local. Adapters externos como MongoDB e Mongoose usam a infraestrutura fornecida pelo consumidor.
 </Callout>
-
----
-
-## Como funcionam os índices
-
-Sempre que um campo do schema possuir `unique: true`, o Tile.JS cria automaticamente um arquivo de índice exclusivo para esse campo.
-
-Esses índices permitem localizar registros rapidamente e garantem que valores únicos nunca sejam duplicados.
-
-No exemplo acima, o schema foi definido assim:
-
-```ts
-const memberSchema = new Schema<Member>({
-  _id: { type: String },
-  email: { type: String, unique: true },
-});
-```
-
-Por isso, foram criados os arquivos:
-
-- `_collection_index_id.json`
-- `_collection_index_email.json`
-
-### Índice do `_id`
-
-Todo documento possui um `_id` único. O arquivo abaixo registra apenas a existência de cada identificador.
-
-```json title=".tile/database/test/members/_collection_index_id.json"
-{
-  "6a3deee44f73903377c3cf0f": true
-}
-```
-
-### Índice do `email`
-
-Como `email` foi definido com `unique: true`, o índice armazena a relação entre o e-mail e o `_id` do documento.
-
-```json title=".tile/database/test/members/_collection_index_email.json"
-{
-  "israel@gmail.com": "6a3deee44f73903377c3cf0f"
-}
-```
-
-<Callout type="tip">
-Qualquer campo marcado com <code>unique: true</code> gera automaticamente um arquivo chamado <code>_collection_index_&lt;nome-do-campo&gt;.json</code>.
-
-Isso permite que o Tile.JS verifique rapidamente se um valor já existe antes de inserir ou atualizar um documento, além de acelerar consultas por campos únicos.
-</Callout>
-
----
-
-## Saída esperada
-
-```bash title="terminal"
-[2026-06-25T01:40:10.097Z] [DEBUG] Collection "members" created
-
-schema: {
-  fields: {
-    _id: { ... },
-    email: { ... },
-    __v: { ... }
-  },
-  timestamps: true
-}
-```
 
 ---
 
@@ -212,7 +159,7 @@ schema: {
     title="Instalação"
     href="/docs/database/installation"
   >
-    Aprenda como instalar o Tile.JS Database.
+    Instale o pacote principal e os adapters opcionais.
   </Card>
 
   <Card
@@ -220,15 +167,15 @@ schema: {
     title="Database"
     href="/docs/database/database"
   >
-    Configure sua primeira database.
+    Entenda a configuração do `Database` e seus modos de uso.
   </Card>
 
   <Card
     icon={<BoxesIcon />}
-    title="Schema"
-    href="/docs/database/schema"
+    title="Adapters"
+    href="/docs/database/adapters"
   >
-    Defina campos, validações e índices.
+    Veja como usar o adapter padrão, MongoDB e Mongoose.
   </Card>
 
   <Card
