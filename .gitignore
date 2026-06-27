@@ -6,6 +6,7 @@
 /discloud
 /deprecated
 /node_modules
+.turbo/
 
 # Files
 /.env

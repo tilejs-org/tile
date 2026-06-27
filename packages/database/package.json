@@ -1,6 +1,6 @@
 {
   "name": "@tile.js/database",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "homepage": "https://tile.js.org/",
   "license": "MIT",
   "type": "module",
@@ -68,6 +68,7 @@
   },
   "scripts": {
     "typegen": "tsc",
+    "typecheck": "tsc --noEmit",
     "build": "bun run ./build.ts",
     "test": "bun run build && node --test ./tests/*.test.mjs",
     "dev": "bun run ./playground/index.ts"

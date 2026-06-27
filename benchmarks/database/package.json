@@ -4,10 +4,13 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "bench": "bun index.ts"
+    "build": "bun --eval \"process.exit(0)\"",
+    "bench": "bun index.ts",
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "typescript": "catalog:"
   },
   "peerDependencies": {
     "typescript": "^5"

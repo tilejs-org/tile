@@ -19,30 +19,33 @@ export type FieldType =
   | "Array"
   | "Object";
 
-export type SchemaDefinition<T extends object> = {
-  [K in keyof T]?:
-    | FieldDefinition
-    | FieldType
-    | typeof String
-    | typeof Number
-    | typeof Boolean
-    | typeof Date;
-} & {
-  _id?:
-    | FieldDefinition
-    | FieldType
-    | typeof String
-    | typeof Number
-    | typeof Boolean
-    | typeof Date;
+export type SchemaFieldType =
+  | FieldType
+  | typeof String
+  | typeof Number
+  | typeof Boolean
+  | typeof Date
+  | typeof Array
+  | typeof Object;
 
-  __v?:
-    | FieldDefinition
-    | FieldType
-    | typeof String
-    | typeof Number
-    | typeof Boolean
-    | typeof Date;
+export type SchemaValue<T> = T extends Date
+  ? FieldDefinition | SchemaFieldType
+  : T extends readonly unknown[]
+    ? FieldDefinition | SchemaFieldType
+    : T extends object
+      ? FieldDefinition
+        | SchemaFieldType
+        | {
+            [K in keyof T]?: SchemaValue<T[K]>;
+          }
+      : FieldDefinition | SchemaFieldType;
+
+export type SchemaDefinition<T extends object> = {
+  [K in keyof T]?: SchemaValue<T[K]>;
+} & {
+  _id?: FieldDefinition | SchemaFieldType;
+
+  __v?: FieldDefinition | SchemaFieldType;
 };
 
 /**
@@ -57,12 +60,7 @@ export type SchemaDefinition<T extends object> = {
  * ```
  */
 export interface FieldDefinition {
-  type?:
-    | FieldType
-    | typeof String
-    | typeof Number
-    | typeof Boolean
-    | typeof Date;
+  type?: SchemaFieldType;
   required?: boolean;
   default?: any;
   unique?: boolean;

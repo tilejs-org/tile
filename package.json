@@ -1,16 +1,22 @@
 {
   "name": "@tile.js/root",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "license": "MIT",
   "private": true,
   "scripts": {
-    "bench": "bun --filter './benchmarks/*' bench",
-    "dev": "bun --filter './packages/*' dev",
-    "build": "bun --filter './packages/*' build"
+    "bench": "turbo run bench",
+    "dev": "turbo run dev --parallel --filter=./packages/*",
+    "dev:all": "turbo run dev --parallel",
+    "build": "turbo run build --filter=./packages/*",
+    "build:all": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck"
   },
   "devDependencies": {
     "@types/bun": "catalog:",
     "@types/node": "catalog:",
+    "turbo": "catalog:",
     "typescript": "catalog:"
   },
   "author": {
@@ -32,10 +38,12 @@
     "@types/node": "^24",
     "@types/bun": "latest",
     "@tile.js/config": "*",
+    "turbo": "^2",
     "typescript": "^5",
     "tsx": "^4"
   },
   "engines": {
     "bun": ">=1"
-  }
+  },
+  "packageManager": "bun@1.3.14"
 }

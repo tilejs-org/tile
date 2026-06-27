@@ -20,6 +20,7 @@ import type {
   StorageAdapter,
 } from "../types.js";
 import type { SchemaDescription } from "../../core/types.js";
+import { getValueAtPath } from "../../utils/object-path.js";
 
 /**
  * Minimal contract for a storage backend.
@@ -456,7 +457,7 @@ export class DefaultStorageAdapter implements StorageEngine, StorageAdapter {
     const index = new Map<string, string>();
 
     for (const doc of docs) {
-      const value = doc?.[field];
+      const value = getValueAtPath(doc, field);
       const id = doc?._id;
 
       if (value === undefined || value === null || typeof id !== "string") {
@@ -666,7 +667,7 @@ export class DefaultStorageAdapter implements StorageEngine, StorageAdapter {
     const state = this.getCollectionStateOrThrow(collection);
 
     for (const field of state.uniqueFields) {
-      const nextValue = nextDocument?.[field];
+      const nextValue = getValueAtPath(nextDocument, field);
       if (nextValue === undefined || nextValue === null) {
         continue;
       }
@@ -684,7 +685,7 @@ export class DefaultStorageAdapter implements StorageEngine, StorageAdapter {
 
     if (previousDocument && typeof previousDocument._id === "string") {
       for (const field of state.uniqueFields) {
-        const previousValue = previousDocument[field];
+        const previousValue = getValueAtPath(previousDocument, field);
         if (previousValue === undefined || previousValue === null) {
           continue;
         }
@@ -699,7 +700,7 @@ export class DefaultStorageAdapter implements StorageEngine, StorageAdapter {
     }
 
     for (const field of state.uniqueFields) {
-      const nextValue = nextDocument[field];
+      const nextValue = getValueAtPath(nextDocument, field);
       if (nextValue === undefined || nextValue === null) {
         continue;
       }
@@ -728,7 +729,7 @@ export class DefaultStorageAdapter implements StorageEngine, StorageAdapter {
     const state = this.getCollectionStateOrThrow(collection);
 
     for (const field of state.uniqueFields) {
-      const previousValue = previousDocument[field];
+      const previousValue = getValueAtPath(previousDocument, field);
       if (previousValue === undefined || previousValue === null) {
         continue;
       }

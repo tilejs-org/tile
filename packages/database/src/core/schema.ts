@@ -4,8 +4,10 @@ import type {
   SchemaDefinition,
   SchemaDescription,
   SchemaFieldDescription,
+  SchemaFieldType,
   SchemaOptions,
 } from "./types.js";
+import { isPlainObject } from "../utils/object-path.js";
 
 /**
  * Defines the shape and rules for a collection.
@@ -26,6 +28,21 @@ import type {
  * ```
  */
 export class Schema<T extends object = Record<string, unknown>> {
+  private static readonly fieldDefinitionKeys = new Set([
+    "type",
+    "required",
+    "default",
+    "unique",
+    "lowercase",
+    "trim",
+    "minLength",
+    "maxLength",
+    "min",
+    "max",
+    "auto",
+    "enum",
+  ]);
+
   private fields: Record<string, FieldDefinition> = {};
   private options: SchemaOptions;
 
@@ -42,25 +59,44 @@ export class Schema<T extends object = Record<string, unknown>> {
   }
 
   private parseDefinition(
-    definition: Record<
-      string,
-      | FieldDefinition
-      | FieldType
-      | typeof String
-      | typeof Number
-      | typeof Boolean
-      | typeof Date
-    >,
+    definition: Record<string, unknown>,
+    parentPath = "",
   ): void {
     for (const [key, value] of Object.entries(definition)) {
+      const fieldName = parentPath ? `${parentPath}.${key}` : key;
+
       if (typeof value === "function") {
-        this.fields[key] = { type: this.getTypeFromConstructor(value) };
-      } else if (typeof value === "string") {
-        this.fields[key] = { type: value as FieldType };
-      } else {
-        this.fields[key] = value as FieldDefinition;
+        this.fields[fieldName] = { type: this.getTypeFromConstructor(value) };
+        continue;
       }
+
+      if (typeof value === "string") {
+        this.fields[fieldName] = { type: value as FieldType };
+        continue;
+      }
+
+      if (this.isFieldDefinition(value)) {
+        this.fields[fieldName] = value;
+        continue;
+      }
+
+      if (isPlainObject(value)) {
+        this.parseDefinition(value, fieldName);
+        continue;
+      }
+
+      this.fields[fieldName] = value as FieldDefinition;
     }
+  }
+
+  private isFieldDefinition(value: unknown): value is FieldDefinition {
+    if (!isPlainObject(value)) {
+      return false;
+    }
+
+    return Object.keys(value).some((key) =>
+      Schema.fieldDefinitionKeys.has(key),
+    );
   }
 
   private ensureInternalFields(): void {
@@ -125,15 +161,7 @@ export class Schema<T extends object = Record<string, unknown>> {
     return "String";
   }
 
-  private getTypeName(
-    value:
-      | FieldType
-      | typeof String
-      | typeof Number
-      | typeof Boolean
-      | typeof Date
-      | undefined,
-  ): string {
+  private getTypeName(value: SchemaFieldType | undefined): string {
     if (!value) {
       return "Unknown";
     }

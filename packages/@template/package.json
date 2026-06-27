@@ -45,6 +45,7 @@
   },
   "scripts": {
     "typegen": "tsc",
+    "typecheck": "tsc --noEmit",
     "build": "bun run ./build.ts",
     "dev": "bun run ./playground/index.ts"
   }

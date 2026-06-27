@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "bun --watch --env-file=.env.development.local src/server.ts",
     "build": "tsc",
+    "typecheck": "tsc --noEmit",
     "start": "NODE_ENV=production node --env-file=.env.local dist/server.js"
   },
   "author": {

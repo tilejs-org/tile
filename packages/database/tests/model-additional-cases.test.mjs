@@ -130,6 +130,62 @@ test("upsert creates when missing and updates when a document already exists", a
   assert.equal(updated.__v, 1);
 });
 
+test("nested schema definitions support defaults, dot-path filters, and nested updates", async () => {
+  const { adapter } = createMemoryAdapter({ withIndexedReads: false });
+  const db = new Database({ storage: adapter });
+  const schema = new Schema({
+    name: { type: String, required: true },
+    email: { type: String, required: true, lowercase: true, trim: true },
+    account: {
+      wallet: {
+        money: { type: Number, default: 0, min: 0 },
+      },
+      profile: {
+        nickname: { type: String, trim: true },
+      },
+    },
+  });
+  const members = db.collection("members", schema);
+
+  const created = await members.create({
+    name: "Israel",
+    email: "  USER@example.com  ",
+    account: {
+      profile: {
+        nickname: "  Izzy  ",
+      },
+    },
+  });
+
+  assert.equal(created.email, "user@example.com");
+  assert.equal(created.account.wallet.money, 0);
+  assert.equal(created.account.profile.nickname, "Izzy");
+
+  const found = await members.findOne({ "account.wallet.money": 0 });
+  assert.equal(found?._id, created._id);
+
+  const updated = await members.updateOne(
+    { _id: created._id },
+    {
+      $inc: { "account.wallet.money": 5 },
+      $set: { "account.profile.nickname": "  Taken  " },
+    },
+  );
+
+  assert.equal(updated?.account.wallet.money, 5);
+  assert.equal(updated?.account.profile.nickname, "Taken");
+
+  const cleared = await members.updateOne(
+    { _id: created._id },
+    { $unset: ["account.profile.nickname"] },
+  );
+
+  assert.equal(cleared?.account.profile.nickname, undefined);
+
+  const foundUpdated = await members.findOne({ "account.wallet.money": 5 });
+  assert.equal(foundUpdated?._id, created._id);
+});
+
 test("deleteMany works with and without filters", async () => {
   const { adapter } = createMemoryAdapter();
   const db = new Database({ storage: adapter });

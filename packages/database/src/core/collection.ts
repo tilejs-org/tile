@@ -2,6 +2,12 @@ import { Schema } from "./schema.js";
 import type { StorageAdapter } from "../adapters/types.js";
 import { Logger } from "../utils/logger.js";
 import { Validator } from "../utils/validator.js";
+import {
+  cloneValue,
+  deleteValueAtPath,
+  getValueAtPath,
+  setValueAtPath,
+} from "../utils/object-path.js";
 import type {
   InternalDocumentFields,
   QueryFilter,
@@ -100,7 +106,7 @@ export class Model<T extends object = Record<string, unknown>>
       return data;
     }
 
-    const result = { ...data };
+    const result = cloneValue(data);
 
     if (this.schema.hasVersionKey() && result.__v === undefined) {
       result.__v = 0;
@@ -113,14 +119,15 @@ export class Model<T extends object = Record<string, unknown>>
 
   private applyDefaults(data: any): any {
     const fields = this.schema.getFields();
-    const result = { ...data };
+    const result = cloneValue(data ?? {});
 
-    if (result._id === undefined || result._id === null || result._id === "") {
-      result._id = this.generateId();
+    const currentId = getValueAtPath(result, "_id");
+    if (currentId === undefined || currentId === null || currentId === "") {
+      setValueAtPath(result, "_id", this.generateId());
     }
 
     if (this.schema.hasVersionKey()) {
-      result.__v = 0;
+      setValueAtPath(result, "__v", 0);
     }
 
     for (const [fieldName, fieldDef] of Object.entries(fields)) {
@@ -128,14 +135,17 @@ export class Model<T extends object = Record<string, unknown>>
         continue;
       }
 
-      if (result[fieldName] === undefined) {
+      if (getValueAtPath(result, fieldName) === undefined) {
         if (fieldDef.auto) {
-          result[fieldName] = this.generateId();
+          setValueAtPath(result, fieldName, this.generateId());
         } else if (fieldDef.default !== undefined) {
-          result[fieldName] =
+          setValueAtPath(
+            result,
+            fieldName,
             typeof fieldDef.default === "function"
               ? fieldDef.default()
-              : fieldDef.default;
+              : cloneValue(fieldDef.default),
+          );
         }
       }
     }
@@ -174,21 +184,23 @@ export class Model<T extends object = Record<string, unknown>>
     const fields = this.schema.getFields();
 
     for (const [fieldName, fieldDef] of Object.entries(fields)) {
-      const value = data[fieldName];
+      const value = getValueAtPath(data, fieldName);
       Validator.validate(value, fieldDef, fieldName);
     }
   }
 
   private processDocument(data: any): any {
     const fields = this.schema.getFields();
-    const result = { ...data };
+    const result = cloneValue(data);
 
     for (const [fieldName, fieldDef] of Object.entries(fields)) {
-      if (result[fieldName] !== undefined) {
-        result[fieldName] = Validator.processValue(
-          result[fieldName],
-          fieldDef,
+      const currentValue = getValueAtPath(result, fieldName);
+
+      if (currentValue !== undefined) {
+        setValueAtPath(
+          result,
           fieldName,
+          Validator.processValue(currentValue, fieldDef, fieldName),
         );
       }
     }
@@ -216,24 +228,24 @@ export class Model<T extends object = Record<string, unknown>>
     doc: any,
     update: UpdateData | UpdateOperators,
   ): any {
-    const nextDoc = { ...doc };
+    const nextDoc = cloneValue(doc);
 
     for (const [key, value] of Object.entries(update)) {
       if (!key.startsWith("$")) {
-        nextDoc[key] = value;
+        setValueAtPath(nextDoc, key, value);
       }
     }
 
     if ("$set" in update && update.$set) {
       for (const [key, value] of Object.entries(update.$set)) {
-        nextDoc[key] = value;
+        setValueAtPath(nextDoc, key, value);
       }
     }
 
     if ("$inc" in update && update.$inc) {
       for (const [key, value] of Object.entries(update.$inc)) {
         const increment = Number(value);
-        const current = nextDoc[key];
+        const current = getValueAtPath(nextDoc, key);
         const currentNumber =
           current === undefined || current === null ? 0 : Number(current);
 
@@ -244,7 +256,7 @@ export class Model<T extends object = Record<string, unknown>>
           throw new Error(`Field "${key}" must use a numeric $inc value`);
         }
 
-        nextDoc[key] = currentNumber + increment;
+        setValueAtPath(nextDoc, key, currentNumber + increment);
       }
     }
 
@@ -258,7 +270,7 @@ export class Model<T extends object = Record<string, unknown>>
         continue;
       }
 
-      delete nextDoc[key];
+      deleteValueAtPath(nextDoc, key);
     }
 
     return nextDoc;
@@ -378,7 +390,7 @@ export class Model<T extends object = Record<string, unknown>>
 
   private matchesFilter(doc: any, filter: QueryFilter): boolean {
     for (const [key, value] of Object.entries(filter)) {
-      if (doc[key] !== value) {
+      if (getValueAtPath(doc, key) !== value) {
         return false;
       }
     }
@@ -481,7 +493,16 @@ export class Model<T extends object = Record<string, unknown>>
       if (existing) {
         return (await this.updateOne(filter, data)) as T & InternalDocumentFields;
       } else {
-        const newDoc = { ...filter, ...data };
+        const newDoc: Record<string, unknown> = {};
+
+        for (const [key, value] of Object.entries(filter)) {
+          setValueAtPath(newDoc, key, value);
+        }
+
+        for (const [key, value] of Object.entries(data)) {
+          setValueAtPath(newDoc, key, value);
+        }
+
         return await this.create(newDoc as any);
       }
     } catch (error) {
@@ -510,8 +531,8 @@ export class Model<T extends object = Record<string, unknown>>
       if (sort) {
         for (const [field, order] of Object.entries(sort)) {
           allDocs.sort((a, b) => {
-            const aVal = a[field];
-            const bVal = b[field];
+            const aVal = getValueAtPath(a, field);
+            const bVal = getValueAtPath(b, field);
 
             if (aVal < bVal) return order === "asc" ? -1 : 1;
             if (aVal > bVal) return order === "asc" ? 1 : -1;

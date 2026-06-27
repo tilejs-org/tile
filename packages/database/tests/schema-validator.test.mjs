@@ -76,6 +76,26 @@ test("Schema.describe reflects internal options and field metadata", () => {
   assert.equal(description.fields.__v.required, true);
 });
 
+test("Schema.describe flattens nested field definitions into dot paths", () => {
+  const schema = new Schema({
+    account: {
+      wallet: {
+        money: {
+          type: Number,
+          default: 0,
+          min: 0,
+        },
+      },
+    },
+  });
+
+  const description = schema.describe();
+
+  assert.equal(description.fields["account.wallet.money"].type, "Number");
+  assert.equal(description.fields["account.wallet.money"].default, 0);
+  assert.equal(description.fields["account.wallet.money"].min, 0);
+});
+
 test("Schema options disable timestamps and version key behavior in persisted documents", async () => {
   const db = new Database({ storage: createMemoryAdapter() });
   const schema = new Schema(
