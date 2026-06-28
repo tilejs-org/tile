@@ -1,0 +1,10 @@
+{
+    "extends": "@tile.js/config/tsconfig",
+    "compilerOptions": {
+        "rootDir": "./src",
+        "outDir": "./dist"
+    },
+    "include": [
+        "src"
+    ]
+}
