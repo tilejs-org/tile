@@ -1,0 +1,171 @@
+---
+title: Campos e validação
+description: Veja tipos suportados, opções de campo, objetos aninhados e limites do schema.
+icon: TableProperties
+---
+
+# Campos e validação
+
+## Tipos suportados
+
+O Tile entende estes tipos internos:
+
+- `String`
+- `Number`
+- `Boolean`
+- `Date`
+- `Array`
+- `Object`
+
+Você pode declarar usando construtores:
+
+```ts
+const schema = new Schema({
+  name: String,
+  age: Number,
+  active: Boolean,
+  createdAtSource: Date,
+  tags: Array,
+  profile: Object,
+});
+```
+
+## Opções de campo
+
+<TypeTable
+  type={{
+    type: {
+      description: "Tipo do campo.",
+      type: "String | Number | Boolean | Date | Array | Object",
+    },
+    required: {
+      description: "Define se o campo é obrigatório.",
+      type: "boolean",
+      default: "false",
+    },
+    default: {
+      description: "Valor padrão aplicado quando o campo não é informado.",
+      type: "any",
+    },
+    unique: {
+      description: "Marca o campo como único para o adapter preparar o índice correspondente.",
+      type: "boolean",
+      default: "false",
+    },
+    lowercase: {
+      description: "Converte strings para minúsculas antes de persistir.",
+      type: "boolean",
+      default: "false",
+    },
+    trim: {
+      description: "Remove espaços no início e no fim da string.",
+      type: "boolean",
+      default: "false",
+    },
+    minLength: {
+      description: "Tamanho mínimo para strings.",
+      type: "number",
+    },
+    maxLength: {
+      description: "Tamanho máximo para strings.",
+      type: "number",
+    },
+    min: {
+      description: "Valor mínimo para números.",
+      type: "number",
+    },
+    max: {
+      description: "Valor máximo para números.",
+      type: "number",
+    },
+    auto: {
+      description: "Gera automaticamente um identificador string para o campo.",
+      type: "boolean",
+      default: "false",
+    },
+    enum: {
+      description: "Lista de valores permitidos.",
+      type: "any[]",
+    },
+  }}
+/>
+
+## Normalização e validação
+
+```ts
+const schema = new Schema({
+  email: {
+    type: String,
+    required: true,
+    lowercase: true,
+    trim: true,
+  },
+  visits: {
+    type: Number,
+    min: 0,
+  },
+  role: {
+    type: String,
+    enum: ["admin", "member"],
+  },
+});
+```
+
+Nesse exemplo, o Tile:
+
+- normaliza `email` com `lowercase` e `trim`
+- rejeita `visits < 0`
+- rejeita valores fora do `enum`
+
+## Objetos aninhados viram dot-paths
+
+```ts
+const schema = new Schema({
+  profile: {
+    name: String,
+    email: { type: String, unique: true },
+  },
+});
+```
+
+Internamente, o schema passa a enxergar:
+
+- `profile.name`
+- `profile.email`
+
+Isso vale para:
+
+- validação
+- defaults
+- updates
+- filtros simples
+
+Exemplo de filtro:
+
+```ts
+await database.member.findOne({
+  "profile.email": "ada@example.com",
+});
+```
+
+## Datas, arrays e objetos
+
+- `Date` aceita `Date`, `string` ou `number`, desde que o valor resulte em uma data válida
+- `Array` valida apenas se o valor é um array
+- `Object` exige um objeto simples e rejeita arrays e `Date`
+
+<Callout type="warning" title="Schema não é strict">
+Campos fora do schema não são removidos automaticamente. Se você passar propriedades extras no documento ou em um update, elas podem ser persistidas normalmente.
+</Callout>
+
+<Callout type="warning" title="Limitações atuais importantes">
+`Array` não descreve o tipo dos itens, e `options._id = false` hoje afeta a descrição do schema, mas os documentos continuam recebendo `_id` internamente.
+</Callout>
+
+## Próximo passo
+
+<Cards>
+  <Card title="Registrar uma collection" href="/docs/collections">
+    Use esse schema na instância `Database` e exponha a collection para o restante da aplicação.
+  </Card>
+</Cards>

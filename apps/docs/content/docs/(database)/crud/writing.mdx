@@ -1,0 +1,141 @@
+---
+title: Escrita, update e remoção
+description: Crie documentos, atualize com operadores, faça upsert e remova registros com segurança.
+icon: SquarePen
+---
+
+# Escrita, update e remoção
+
+## `create()`
+
+Insere um novo documento após aplicar defaults, normalização e validação.
+
+```ts
+const member = await database.member.create({
+  name: "Ada Lovelace",
+  email: "ADA@EXAMPLE.COM",
+});
+```
+
+Retorno esperado:
+
+```ts
+{
+  _id: "68526dba05db8ec36dcb33d8",
+  name: "Ada Lovelace",
+  email: "ada@example.com",
+  __v: 0,
+  createdAt: Date,
+  updatedAt: Date,
+}
+```
+
+## `updateOne()`
+
+Atualiza o primeiro documento encontrado e retorna o documento atualizado.
+
+### Merge direto
+
+```ts
+const updated = await database.member.updateOne(
+  { email: "ada@example.com" },
+  { verified: true },
+);
+```
+
+### Usando operadores
+
+```ts
+const updated = await database.member.updateOne(
+  { email: "ada@example.com" },
+  {
+    $set: {
+      verified: true,
+      name: "Ada Byron",
+    },
+    $inc: {
+      visits: 1,
+    },
+    $unset: ["note"],
+  },
+);
+```
+
+### Operadores suportados
+
+<TypeTable
+  type={{
+    $set: {
+      description: "Define novos valores.",
+      type: "Record<string, any>",
+    },
+    $inc: {
+      description: "Incrementa campos numéricos.",
+      type: "Record<string, number>",
+    },
+    $unset: {
+      description: "Remove campos por lista ou mapa booleano.",
+      type: "string[] | Record<string, boolean>",
+    },
+    $delete: {
+      description: "Alias para `$unset`.",
+      type: "string[] | Record<string, boolean>",
+    },
+  }}
+/>
+
+## `upsert()`
+
+Atualiza quando encontra um documento e cria um novo quando nada é encontrado.
+
+```ts
+const member = await database.member.upsert(
+  { email: "ada@example.com" },
+  {
+    name: "Ada Lovelace",
+    verified: true,
+  },
+);
+```
+
+<Callout type="tip" title="Como o create implícito acontece no upsert">
+Quando o documento ainda não existe, o Tile cria um novo objeto combinando o `filter` com o `data` informado no `upsert()`.
+</Callout>
+
+## `deleteOne()`
+
+Remove o primeiro documento correspondente ao filtro:
+
+```ts
+await database.member.deleteOne({
+  email: "ada@example.com",
+});
+```
+
+## `deleteMany()`
+
+Remove vários documentos:
+
+```ts
+await database.member.deleteMany({
+  verified: false,
+});
+```
+
+Sem filtro, remove tudo da collection:
+
+```ts
+await database.member.deleteMany();
+```
+
+<Callout type="warning" title="Não mutacione _id em updates">
+Evite alterar `_id` em `updateOne()`. O comportamento atual da biblioteca não trata isso como uma renomeação segura do registro.
+</Callout>
+
+## Próximo passo
+
+<Cards>
+  <Card title="Paginação" href="/docs/crud/pagination">
+    Veja como `paginate()` funciona, quais opções aceita e quais limites ela tem.
+  </Card>
+</Cards>

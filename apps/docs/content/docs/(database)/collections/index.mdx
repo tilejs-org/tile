@@ -1,0 +1,105 @@
+---
+title: Collections
+description: Registre collections, exponha a camada de dados e use a API pública de documentos.
+icon: Table
+---
+
+import { File, Folder, Files } from "fumadocs-ui/components/files";
+import { SquarePen, Table } from "lucide-react";
+
+# Collections
+
+Uma collection é a interface usada pela aplicação para trabalhar com documentos.
+
+Toda collection pertence a uma instância de `Database` e utiliza um `Schema` para validar e normalizar os dados.
+
+## Registrando uma collection
+
+Normalmente, ela fica centralizada em `src/database/index.ts`:
+
+```ts title="src/database/index.ts"
+import { Database } from "@tile.js/database";
+import { memberSchema, type Member } from "./schema/member.ts";
+
+const connection = new Database({ dbName: "app" });
+
+export const database = Object.assign(connection, {
+  member: connection.collection<Member>("member", memberSchema),
+});
+```
+
+`model()` é apenas um alias de `collection()`:
+
+```ts
+const member = connection.model<Member>("member", memberSchema);
+```
+
+## Métodos mais usados
+
+<TypeTable
+  type={{
+    create: {
+      description: "Insere um documento novo.",
+      type: "(document) => Promise<T & InternalDocumentFields>",
+    },
+    findOne: {
+      description: "Busca o primeiro documento que corresponde ao filtro.",
+      type: "(filter) => Promise<T | null>",
+    },
+    updateOne: {
+      description: "Atualiza o primeiro documento encontrado.",
+      type: "(filter, update) => Promise<T | null>",
+    },
+    upsert: {
+      description: "Atualiza se encontrar; cria se não existir.",
+      type: "(filter, data) => Promise<T>",
+    },
+    paginate: {
+      description: "Retorna um recorte paginado da collection.",
+      type: "(options?) => Promise<PaginateResult<T>>",
+    },
+    describeSchema: {
+      description: "Retorna uma descrição amigável do schema associado.",
+      type: "() => SchemaDescription",
+    },
+  }}
+/>
+
+## Estrutura recomendada
+
+<Files>
+  <Folder name="src" defaultOpen>
+    <Folder name="database" defaultOpen>
+      <File name="index.ts" />
+      <Folder name="schema" defaultOpen>
+        <File name="member.ts" />
+      </Folder>
+    </Folder>
+    <File name="index.ts" />
+  </Folder>
+</Files>
+
+## Cache por nome
+
+```ts
+const memberA = connection.collection("member", memberSchema);
+const memberB = connection.collection("member", memberSchema);
+
+console.log(memberA === memberB); // true
+```
+
+<Callout type="tip">
+Cada instância de `Database` mantém uma única collection por nome. Isso evita recriação desnecessária e mantém a aplicação trabalhando sempre com o mesmo objeto.
+</Callout>
+
+## Próximos passos
+
+<Cards>
+  <Card icon={<Table />} title="Organização em projetos reais" href="/docs/collections/organization">
+    Veja sugestões de estrutura para apps simples, modulares e monorepos.
+  </Card>
+
+  <Card icon={<SquarePen />} title="CRUD" href="/docs/crud">
+    Aprofunde em leitura, escrita, remoção e paginação.
+  </Card>
+</Cards>

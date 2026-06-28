@@ -1,0 +1,91 @@
+---
+title: Lifecycle e conexão
+description: Entenda connect, disconnect, isConnected e o comportamento por adapter.
+icon: Database
+---
+
+# Lifecycle e conexão
+
+A classe `Database` expõe um lifecycle simples:
+
+```ts
+await database.connect();
+console.log(database.isConnected()); // true
+await database.disconnect();
+```
+
+## O que cada método faz
+
+### `connect()`
+
+- chama `storage.connect?.()` quando o adapter implementa o método
+- marca o estado interno da instância como conectada
+- registra logs quando o logger está habilitado
+
+### `disconnect()`
+
+- chama `storage.flush?.()` antes de encerrar
+- depois chama `storage.disconnect?.()` quando disponível
+- marca o estado interno como desconectado
+
+### `isConnected()`
+
+- retorna apenas o estado interno da instância `Database`
+- **não** verifica ativamente o estado real do driver remoto
+
+<Callout type="warning" title="Leitura correta de isConnected()">
+`isConnected()` é um flag local do `Database`. Ele não faz ping em MongoDB, não consulta o estado de uma `Connection` do Mongoose e não prova que a conexão remota está saudável naquele instante.
+</Callout>
+
+## Comportamento por backend
+
+| Backend | `connect()` | `disconnect()` | Observação |
+| --- | --- | --- | --- |
+| Adapter padrão | opcional | faz `flush()` antes de encerrar | útil para marcar o ciclo da aplicação e forçar persistência pendente |
+| MongoDB | chama `client.connect()` se `manageClient !== false` | chama `client.close()` se `manageClient !== false` | com `manageClient: false`, o consumidor controla o client |
+| Mongoose | conecta via `uri` ou aguarda a conexão existente | fecha/desconecta se `manageConnection !== false` | aceita instância `mongoose` ou `Connection` |
+| Adapter customizado | depende da implementação | depende da implementação | o contrato é definido por `StorageAdapter` |
+
+## Preciso chamar `connect()` sempre?
+
+Na prática, o CRUD pode funcionar mesmo sem um `connect()` explícito quando o adapter não exige isso.
+
+Ainda assim, em aplicações reais, é uma boa prática abrir e fechar o ciclo de forma explícita:
+
+```ts title="src/index.ts"
+import { database } from "./database/index.ts";
+
+async function main() {
+  await database.connect();
+
+  const total = await database.member.countDocuments();
+  console.log({ total });
+
+  await database.disconnect();
+}
+
+void main();
+```
+
+## Quando isso importa mais
+
+- **CLIs**: para garantir flush antes do processo terminar
+- **workers**: para padronizar boot e shutdown
+- **apps com MongoDB/Mongoose**: para decidir se o Tile ou o consumidor gerenciam a conexão
+- **testes**: para deixar setup e teardown explícitos
+
+<Callout type="tip">
+Se você usa MongoDB ou Mongoose com conexão já gerenciada em outro ponto da aplicação, geralmente faz sentido configurar `manageClient: false` ou `manageConnection: false` e delegar esse lifecycle ao seu bootstrap principal.
+</Callout>
+
+## Próximos passos
+
+<Cards>
+  <Card title="MongoDB adapter" href="/docs/adapters/mongodb">
+    Veja como o Tile integra lifecycle e schema metadata com um `MongoClient`.
+  </Card>
+
+  <Card title="Mongoose adapter" href="/docs/adapters/mongoose">
+    Entenda o comportamento com instância `mongoose` ou `Connection`.
+  </Card>
+</Cards>

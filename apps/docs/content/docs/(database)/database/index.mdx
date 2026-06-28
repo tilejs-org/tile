@@ -1,0 +1,175 @@
+---
+title: Database
+description: Configure a instância principal, o adapter, o logger e o cache de collections.
+icon: Database
+---
+
+import { File, Folder, Files } from "fumadocs-ui/components/files";
+import { BoxesIcon, DatabaseIcon, TableProperties } from "lucide-react";
+
+# Database
+
+A classe `Database` é a fachada principal do `@tile.js/database`.
+
+Ela é responsável por:
+
+- escolher o backend de persistência
+- centralizar o lifecycle da conexão
+- expor `collection()` e `model()`
+- manter cache das collections por nome
+- aplicar a configuração de logger
+
+## Uso mais comum
+
+<Tabs items={["local", "adapter-customizado"]}>
+  <Tab value="local">
+
+```ts title="src/database/index.ts"
+import { Database } from "@tile.js/database";
+import { memberSchema, type Member } from "./schema/member.ts";
+
+const connection = new Database({
+  dbName: "app",
+  storage: "workspace",
+  logger: {
+    enabled: true,
+    colors: true,
+  },
+});
+
+export const database = Object.assign(connection, {
+  member: connection.collection<Member>("member", memberSchema),
+});
+```
+
+  </Tab>
+
+  <Tab value="adapter-customizado">
+
+```ts title="src/database/index.ts"
+import { Database } from "@tile.js/database";
+import { mongodbAdapter } from "@tile.js/database/adapters/mongodb";
+import { MongoClient } from "mongodb";
+import { memberSchema, type Member } from "./schema/member.ts";
+
+const client = new MongoClient("mongodb://127.0.0.1:27017");
+
+const connection = new Database({
+  storage: mongodbAdapter(client, {
+    dbName: "app",
+    manageClient: true,
+  }),
+});
+
+export const database = Object.assign(connection, {
+  member: connection.collection<Member>("member", memberSchema),
+});
+```
+
+  </Tab>
+</Tabs>
+
+<Callout type="warning" title="Regra do construtor">
+Se `storage` receber um `StorageAdapter`, não passe `dbName` nem `compression` no `new Database(...)`. Essas opções deixam de ser válidas no construtor e devem ser configuradas no adapter.
+</Callout>
+
+## Configuração
+
+<TypeTable
+  type={{
+    dbName: {
+      description: "Nome da database usada pelo adapter padrão local.",
+      type: "string",
+      default: '"test"',
+    },
+    storage: {
+      description: "Pode ser `workspace`, `global` ou um `StorageAdapter` customizado.",
+      type: '"workspace" | "global" | StorageAdapter',
+      default: '"workspace"',
+    },
+    compression: {
+      description: "Habilita gzip no adapter padrão local.",
+      type: "boolean",
+      default: "false",
+    },
+    logger: {
+      description: "Controla logs do runtime do Tile.",
+      type: "{ enabled?: boolean; colors?: boolean }",
+      default: "{ enabled: false, colors: false }",
+    },
+  }}
+/>
+
+## `collection()` e `model()`
+
+As duas APIs são equivalentes:
+
+```ts
+const userA = connection.collection("user", userSchema);
+const userB = connection.model("user", userSchema);
+
+console.log(userA === userB); // true
+```
+
+Você também pode recuperar a collection já registrada:
+
+```ts
+const user = connection.getCollection("user");
+const userAlias = connection.getModel("user");
+```
+
+<Callout type="tip">
+O cache é feito por **nome da collection**. Se você registrar o mesmo nome duas vezes, a primeira instância será reutilizada.
+</Callout>
+
+## Estrutura recomendada
+
+<Files>
+  <Folder name="src" defaultOpen>
+    <Folder name="database" defaultOpen>
+      <File name="index.ts" />
+      <Folder name="schema" defaultOpen>
+        <File name="member.ts" />
+      </Folder>
+    </Folder>
+    <File name="index.ts" />
+  </Folder>
+</Files>
+
+Para a maior parte dos projetos, concentrar a instância em `src/database/index.ts` e os schemas em `src/database/schema/*.ts` já deixa o bootstrap claro e previsível.
+
+## Responsabilidades da instância
+
+<Cards cols={2}>
+  <Card icon={<DatabaseIcon />} title="Backend">
+    Decide se a persistência será local, MongoDB, Mongoose ou um adapter próprio.
+  </Card>
+
+  <Card icon={<DatabaseIcon />} title="Collections">
+    Garante que cada nome de collection tenha uma única instância ativa por `Database`.
+  </Card>
+
+  <Card icon={<DatabaseIcon />} title="Lifecycle">
+    Encapsula `connect()`, `disconnect()` e o flush pendente quando o adapter suporta isso.
+  </Card>
+
+  <Card icon={<DatabaseIcon />} title="Logger">
+    Mantém mensagens de debug, info e erro no mesmo ponto de configuração.
+  </Card>
+</Cards>
+
+## Próximos passos
+
+<Cards>
+  <Card icon={<BoxesIcon />} title="Lifecycle e estado de conexão" href="/docs/database/lifecycle">
+    Entenda quando chamar `connect()` e `disconnect()`, e o que `isConnected()` realmente informa.
+  </Card>
+
+  <Card icon={<BoxesIcon />} title="Escolher um adapter" href="/docs/adapters">
+    Compare o adapter local, MongoDB, Mongoose e o contrato de adapters customizados.
+  </Card>
+
+  <Card icon={<TableProperties />} title="Definir o schema" href="/docs/schema">
+    Depois da instância principal, o próximo passo é modelar os documentos.
+  </Card>
+</Cards>

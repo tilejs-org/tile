@@ -1,0 +1,131 @@
+---
+title: Adapter customizado
+description: Implemente o contrato StorageAdapter para persistir documentos em outro backend.
+icon: Boxes
+---
+
+# Adapter customizado
+
+Se o backend de persistência da sua aplicação não é BSON local, MongoDB ou Mongoose, você pode implementar o contrato `StorageAdapter`.
+
+## Contrato principal
+
+<TypeTable
+  type={{
+    prepareCollection: {
+      description: "Inicializa a collection e recebe metadados como `uniqueFields` e `schema`.",
+      type: "(collection, options?) => Promise<void>",
+    },
+    write: {
+      description: "Persiste um documento pelo `id`.",
+      type: "(collection, id, data) => Promise<void>",
+    },
+    read: {
+      description: "Lê um documento pelo `id`.",
+      type: "(collection, id) => Promise<any | null>",
+    },
+    delete: {
+      description: "Remove um documento pelo `id`.",
+      type: "(collection, id) => Promise<void>",
+    },
+    list: {
+      description: "Retorna todos os documentos da collection.",
+      type: "(collection) => Promise<any[]>",
+    },
+    readByIndexedField: {
+      description: "Opcional. Otimiza `findOne()` quando o filtro usa um campo único.",
+      type: "(collection, field, value) => Promise<any | null>",
+    },
+    connect: {
+      description: "Opcional. Executado por `database.connect()`.",
+      type: "() => Promise<void>",
+    },
+    disconnect: {
+      description: "Opcional. Executado por `database.disconnect()`.",
+      type: "() => Promise<void>",
+    },
+    flush: {
+      description: "Opcional. Executado antes de `disconnect()`.",
+      type: "() => Promise<void>",
+    },
+  }}
+/>
+
+## Opções recebidas em `prepareCollection`
+
+<TypeTable
+  type={{
+    uniqueFields: {
+      description: "Campos marcados como únicos pelo `Schema`.",
+      type: "string[]",
+    },
+    schema: {
+      description: "Resultado de `schema.describe()` para tooling e persistência de metadados.",
+      type: "SchemaDescription",
+    },
+  }}
+/>
+
+## Exemplo mínimo: adapter em memória
+
+```ts title="memory-adapter.ts"
+import type { StorageAdapter } from "@tile.js/database";
+
+export function memoryAdapter(): StorageAdapter {
+  const collections = new Map<string, Map<string, any>>();
+
+  const getCollection = (name: string) => {
+    let docs = collections.get(name);
+
+    if (!docs) {
+      docs = new Map();
+      collections.set(name, docs);
+    }
+
+    return docs;
+  };
+
+  return {
+    async prepareCollection(collection) {
+      getCollection(collection);
+    },
+
+    async write(collection, id, data) {
+      getCollection(collection).set(String(id), structuredClone(data));
+    },
+
+    async read(collection, id) {
+      return structuredClone(getCollection(collection).get(String(id)) ?? null);
+    },
+
+    async delete(collection, id) {
+      getCollection(collection).delete(String(id));
+    },
+
+    async list(collection) {
+      return Array.from(getCollection(collection).values()).map((doc) =>
+        structuredClone(doc),
+      );
+    },
+  };
+}
+```
+
+Uso:
+
+```ts
+import { Database } from "@tile.js/database";
+import { memoryAdapter } from "./memory-adapter";
+
+const database = new Database({
+  storage: memoryAdapter(),
+});
+```
+
+<Callout type="tip" title="O melhor extra opcional">
+Se o seu adapter conseguir implementar `readByIndexedField()`, o método `findOne()` pode evitar varreduras completas quando o filtro usa um campo único.
+</Callout>
+
+<Callout type="warning" title="Configuração no lugar certo">
+Quando você passa um adapter customizado para `new Database({ storage: ... })`, opções como `dbName` e `compression` deixam de ser válidas no construtor da `Database` e precisam viver no próprio adapter.
+</Callout>

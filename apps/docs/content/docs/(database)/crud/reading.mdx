@@ -1,0 +1,79 @@
+---
+title: Leitura e filtros
+description: Busque documentos por igualdade, _id, campos únicos e caminhos aninhados.
+icon: SquarePen
+---
+
+# Leitura e filtros
+
+## `findOne()`
+
+Retorna o primeiro documento que corresponde ao filtro informado.
+
+```ts
+const member = await database.member.findOne({
+  email: "ada@example.com",
+});
+```
+
+Se o filtro usar um campo marcado como `unique`, o Tile pode aproveitar leitura indexada quando o adapter oferecer essa otimização.
+
+## `find()`
+
+Retorna todos os documentos que correspondem ao filtro.
+
+```ts
+const verifiedMembers = await database.member.find({
+  verified: true,
+});
+```
+
+Sem filtro, retorna todos os documentos da collection:
+
+```ts
+const allMembers = await database.member.find();
+```
+
+## Filtros por dot-path
+
+Objetos aninhados podem ser consultados por caminhos com ponto:
+
+```ts
+const member = await database.member.findOne({
+  "profile.email": "ada@example.com",
+});
+```
+
+## `findOneByID()` e `findOneById()`
+
+Use essas APIs quando você já tem o `_id` do documento:
+
+```ts
+const member = await database.member.findOneByID("68526dba05db8ec36dcb33d8");
+const sameMember = await database.member.findOneById("68526dba05db8ec36dcb33d8");
+```
+
+## `countDocuments()`
+
+Conta documentos com ou sem filtro:
+
+```ts
+const total = await database.member.countDocuments();
+const verifiedTotal = await database.member.countDocuments({ verified: true });
+```
+
+<Callout type="warning" title="Limitações de filtro">
+Os filtros funcionam por igualdade simples. Isso significa que não existem operadores de query como `$gt`, `$lt`, `$in`, `$or`, regex ou comparações profundas nativas.
+</Callout>
+
+## Sobre performance em adapters remotos
+
+Com MongoDB e Mongoose, o melhor caso acontece em `findOne()` usando campo único. Já operações como `find()` e `countDocuments()` continuam seguindo a semântica do Tile e podem depender da listagem da collection pelo adapter.
+
+## Próximo passo
+
+<Cards>
+  <Card title="Escrita e remoção" href="/docs/crud/writing">
+    Continue com `create`, `updateOne`, `upsert`, operadores e deleções.
+  </Card>
+</Cards>

@@ -1,0 +1,121 @@
+---
+title: Adapter padrão (BSON local)
+description: Use o adapter local em BSON com persistência automática em .tile/database.
+icon: Database
+---
+
+import { File, Folder, Files } from "fumadocs-ui/components/files";
+
+# Adapter padrão (BSON local)
+
+O adapter padrão é a forma mais simples de usar o Tile Database.
+
+Ele já vem junto com `@tile.js/database`, grava documentos em **BSON**, mantém metadados em **JSON** e não exige nenhuma dependência externa.
+
+## Uso implícito ou explícito
+
+<Tabs items={["implicito", "explicito"]}>
+  <Tab value="implicito">
+
+```ts
+import { Database } from "@tile.js/database";
+
+const database = new Database({
+  dbName: "app",
+});
+```
+
+  </Tab>
+
+  <Tab value="explicito">
+
+```ts
+import { Database, defaultAdapter } from "@tile.js/database";
+
+const database = new Database({
+  storage: defaultAdapter({
+    dbName: "app",
+    storage: "workspace",
+    compression: false,
+  }),
+});
+```
+
+  </Tab>
+</Tabs>
+
+## Configuração do adapter
+
+<TypeTable
+  type={{
+    dbName: {
+      description: "Nome da database local.",
+      type: "string",
+    },
+    storage: {
+      description: "Onde os dados serão gravados no sistema de arquivos.",
+      type: '"workspace" | "global"',
+      default: '"workspace"',
+    },
+    compression: {
+      description: "Compacta BSON com gzip antes de gravar em disco.",
+      type: "boolean",
+      default: "false",
+    },
+  }}
+/>
+
+## Onde os arquivos ficam
+
+<Files>
+  <Folder name=".tile" defaultOpen>
+    <Folder name="database" defaultOpen>
+      <Folder name="app" defaultOpen>
+        <Folder name="members" defaultOpen>
+          <File name="_schema.json" />
+          <File name="_collection_index_email.json" />
+          <File name="68526dba05db8ec36dcb33d8.bson" />
+        </Folder>
+      </Folder>
+    </Folder>
+  </Folder>
+</Files>
+
+## `workspace` vs `global`
+
+### `workspace`
+
+Salva os dados em `process.cwd()/.tile/database/<dbName>`.
+
+É a opção ideal para aplicações, APIs e projetos onde os dados precisam acompanhar o diretório atual do app.
+
+### `global`
+
+Salva os dados em `~/.tile/database/<dbName>`.
+
+É útil para CLIs, ferramentas de linha de comando e cenários onde você quer compartilhar a mesma base entre múltiplos projetos do mesmo usuário.
+
+## Índices e metadados
+
+- cada campo com `unique: true` gera um índice local em JSON
+- o schema descrito é salvo em `_schema.json`
+- o adapter prepara a collection automaticamente na primeira utilização
+
+<Callout type="tip" title="Flush e encerramento do processo">
+O adapter local acumula operações de escrita/remoção e faz flush assíncrono. Chamar `database.disconnect()` é a forma mais segura de garantir persistência antes do encerramento da aplicação.
+</Callout>
+
+## Quando usar
+
+- protótipos e MVPs
+- CLIs e automações
+- apps locais ou embarcadas
+- testes de integração sem depender de um banco remoto
+
+## Próximo passo
+
+<Cards>
+  <Card title="Configurar a instância Database" href="/docs/database">
+    Veja como `dbName`, `storage`, `compression` e `logger` entram no bootstrap da aplicação.
+  </Card>
+</Cards>

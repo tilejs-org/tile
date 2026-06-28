@@ -1,0 +1,101 @@
+---
+title: MongoDB adapter
+description: Integre o Tile Database ao driver oficial do MongoDB usando um MongoClient.
+icon: Database
+---
+
+# MongoDB adapter
+
+O adapter de MongoDB usa um `MongoClient` fornecido pelo projeto consumidor.
+
+Ele não adiciona `mongodb` como dependência interna da biblioteca, então a instalação e o lifecycle do client continuam sob seu controle — totalmente ou parcialmente, conforme a configuração escolhida.
+
+## Exemplo de uso
+
+```ts title="src/database/index.ts"
+import { Database } from "@tile.js/database";
+import { mongodbAdapter } from "@tile.js/database/adapters/mongodb";
+import { MongoClient } from "mongodb";
+import { memberSchema, type Member } from "./schema/member.ts";
+
+const client = new MongoClient("mongodb://127.0.0.1:27017");
+
+const connection = new Database({
+  storage: mongodbAdapter(client, {
+    dbName: "app",
+    persistSchema: true,
+    schemaCollection: "_tile_schemas",
+    manageClient: true,
+  }),
+});
+
+export const database = Object.assign(connection, {
+  member: connection.collection<Member>("member", memberSchema),
+});
+```
+
+## Configuração
+
+<TypeTable
+  type={{
+    dbName: {
+      description: "Nome da database selecionada no client.",
+      type: "string",
+    },
+    persistSchema: {
+      description: "Persiste `schema.describe()` em uma collection interna.",
+      type: "boolean",
+      default: "true",
+    },
+    schemaCollection: {
+      description: "Nome da collection que guarda metadados de schema.",
+      type: "string",
+      default: '"_tile_schemas"',
+    },
+    manageClient: {
+      description: "Controla se `database.connect()` e `database.disconnect()` chamam `client.connect()` e `client.close()`.",
+      type: "boolean",
+      default: "true",
+    },
+  }}
+/>
+
+## O que o adapter faz por você
+
+- usa `replaceOne(..., { upsert: true })` para escrita
+- usa `findOne({ _id })` para leitura por id
+- cria índice único para cada campo `unique`, exceto `_id`
+- pode persistir a descrição do schema em uma collection interna
+
+<Callout type="info" title="Client compatível">
+O adapter aceita qualquer objeto compatível com o shape de um `MongoClient`: precisa expor `db(name?)` e, opcionalmente, `connect()` e `close()`.
+</Callout>
+
+## Lifecycle
+
+Se `manageClient` estiver ativo, o fluxo fica assim:
+
+```ts
+await database.connect();
+await database.disconnect();
+```
+
+Nesse caso, o Tile delega para `client.connect()` e `client.close()`.
+
+Se `manageClient: false`, a conexão é controlada fora do Tile e esses métodos deixam de gerenciar o client.
+
+## Limitações importantes
+
+<Callout type="warning" title="Nem toda operação roda como query nativa do MongoDB">
+`find()`, `countDocuments()`, `deleteMany()` e `paginate()` continuam usando a semântica do Tile sobre `list()`. Se você precisa de filtros avançados, agregações ou paginação executada diretamente pelo banco, use o driver do MongoDB no ponto específico da aplicação.
+</Callout>
+
+O melhor caso de otimização acontece em `findOne()` quando o filtro usa um campo único, porque o adapter consegue fazer leitura indexada.
+
+## Próximo passo
+
+<Cards>
+  <Card title="Ver CRUD de leitura" href="/docs/crud/reading">
+    Entenda como filtros simples, leitura por id e `countDocuments()` se comportam com o Tile.
+  </Card>
+</Cards>

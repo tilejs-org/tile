@@ -1,0 +1,18 @@
+{
+  "title": "Database",
+  "description": "Documentação oficial do @tile.js/database",
+  "icon": "Database",
+  "root": true,
+  "pages": [
+    "index",
+    "---Primeiros passos---",
+    "get-started",
+    "installation",
+    "---Guia da API---",
+    "database",
+    "adapters",
+    "schema",
+    "collections",
+    "crud"
+  ]
+}

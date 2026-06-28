@@ -1,0 +1,150 @@
+---
+title: Visão geral
+description: Guia oficial do @tile.js/database para BSON local, MongoDB e Mongoose.
+icon: Album
+---
+
+import {
+  BoxesIcon,
+  DatabaseIcon,
+  Download,
+  RocketIcon,
+  SquarePen,
+  Table,
+  TableProperties,
+} from "lucide-react";
+
+# @tile.js/database
+
+O `@tile.js/database` é uma camada de persistência tipada para **Node.js** e **Bun** com a mesma API sobre múltiplos backends.
+
+Você pode começar com o adapter local em **BSON**, e depois migrar para **MongoDB**, **Mongoose** ou até um adapter próprio sem reescrever toda a superfície pública da sua aplicação.
+
+<Callout type="info" title="O foco da biblioteca">
+O Tile mantém uma API pequena, previsível e orientada a documentos. Ele não tenta reproduzir toda a linguagem de query do MongoDB nem substituir um ORM/ODM completo.
+</Callout>
+
+## O que você encontra nesta documentação
+
+<Cards cols={2}>
+  <Card icon={<RocketIcon />} title="Primeiros passos" href="/docs/get-started">
+    Entenda o fluxo recomendado e monte o primeiro projeto sem perder tempo.
+  </Card>
+
+  <Card icon={<Download />} title="Instalação" href="/docs/installation">
+    Instale o pacote principal e veja quando adicionar dependências opcionais.
+  </Card>
+
+  <Card icon={<DatabaseIcon />} title="Database" href="/docs/database">
+    Configure a instância principal, lifecycle, logger e cache de collections.
+  </Card>
+
+  <Card icon={<BoxesIcon />} title="Adapters" href="/docs/adapters">
+    Compare o adapter local, MongoDB, Mongoose e o contrato para adapters customizados.
+  </Card>
+
+  <Card icon={<TableProperties />} title="Schema" href="/docs/schema">
+    Modele tipos, defaults, índices únicos, normalização e validação.
+  </Card>
+
+  <Card icon={<Table />} title="Collections" href="/docs/collections">
+    Registre collections, organize a camada de dados e trabalhe com documentos.
+  </Card>
+
+  <Card icon={<SquarePen />} title="CRUD" href="/docs/crud">
+    Veja inserção, leitura, atualização, remoção e paginação com exemplos reais.
+  </Card>
+</Cards>
+
+## Mesmo fluxo, backends diferentes
+
+<Tabs items={["local", "mongodb", "mongoose"]}>
+  <Tab value="local">
+
+```ts title="src/database/index.ts"
+import { Database } from "@tile.js/database";
+import { memberSchema, type Member } from "./schema/member.ts";
+
+const connection = new Database({
+  dbName: "app",
+});
+
+export const database = Object.assign(connection, {
+  member: connection.collection<Member>("member", memberSchema),
+});
+```
+
+  </Tab>
+
+  <Tab value="mongodb">
+
+```ts title="src/database/index.ts"
+import { Database } from "@tile.js/database";
+import { mongodbAdapter } from "@tile.js/database/adapters/mongodb";
+import { MongoClient } from "mongodb";
+import { memberSchema, type Member } from "./schema/member.ts";
+
+const client = new MongoClient("mongodb://127.0.0.1:27017");
+
+const connection = new Database({
+  storage: mongodbAdapter(client, {
+    dbName: "app",
+  }),
+});
+
+export const database = Object.assign(connection, {
+  member: connection.collection<Member>("member", memberSchema),
+});
+```
+
+  </Tab>
+
+  <Tab value="mongoose">
+
+```ts title="src/database/index.ts"
+import mongoose from "mongoose";
+import { Database } from "@tile.js/database";
+import { mongooseAdapter } from "@tile.js/database/adapters/mongoose";
+import { memberSchema, type Member } from "./schema/member.ts";
+
+const connection = new Database({
+  storage: mongooseAdapter(mongoose, {
+    uri: "mongodb://127.0.0.1:27017",
+    dbName: "app",
+  }),
+});
+
+export const database = Object.assign(connection, {
+  member: connection.collection<Member>("member", memberSchema),
+});
+```
+
+  </Tab>
+</Tabs>
+
+## Conceitos centrais
+
+- **`Database`** centraliza configuração, adapter, logger e cache de collections.
+- **`Schema`** define estrutura, defaults, normalização e validação dos documentos.
+- **`Collection`** expõe a API de CRUD usada pela aplicação.
+- **`StorageAdapter`** troca o backend sem mudar o contrato principal da biblioteca.
+
+<Callout type="warning" title="Importante sobre consultas e paginação">
+Mesmo usando MongoDB ou Mongoose, operações como `find()`, `countDocuments()`, `deleteMany()` e `paginate()` continuam seguindo a semântica do Tile. Se você precisa de queries avançadas, agregações ou filtros executados diretamente pelo banco, trate o driver/ODM nativo no ponto específico da aplicação.
+</Callout>
+
+## Trilhas de leitura
+
+<Cards cols={3}>
+  <Card title="Quero sair do zero" href="/docs/get-started">
+    Vá por `Iniciando` → `Instalação` → `Projeto em 5 minutos`.
+  </Card>
+
+  <Card title="Quero escolher o backend" href="/docs/adapters">
+    Compare primeiro os adapters e depois aprofunde no que fizer sentido para seu caso.
+  </Card>
+
+  <Card title="Quero entender a API" href="/docs/database">
+    Siga por `Database` → `Schema` → `Collections` → `CRUD`.
+  </Card>
+</Cards>

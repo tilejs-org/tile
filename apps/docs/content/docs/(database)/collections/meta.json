@@ -1,0 +1,5 @@
+{
+  "title": "Collections",
+  "icon": "Table",
+  "pages": ["index", "organization"]
+}

@@ -1,0 +1,136 @@
+---
+title: Dependências por adapter
+description: Saiba quais dependências extras instalar e quais imports usar em cada backend.
+icon: Boxes
+---
+
+# Dependências por adapter
+
+O pacote principal resolve apenas o núcleo do Tile Database e o adapter local. Para adapters remotos, o projeto consumidor precisa fornecer as dependências e a conexão correspondente.
+
+## Visão rápida
+
+| Cenário | Pacotes extras | Import do adapter |
+| --- | --- | --- |
+| BSON local | nenhum | opcional, pois o local já é o padrão |
+| MongoDB | `mongodb` | `@tile.js/database/adapters/mongodb` |
+| Mongoose | `mongoose` | `@tile.js/database/adapters/mongoose` |
+
+## MongoDB
+
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+  <Tab value="npm">
+
+```bash
+npm install mongodb
+```
+
+  </Tab>
+
+  <Tab value="pnpm">
+
+```bash
+pnpm add mongodb
+```
+
+  </Tab>
+
+  <Tab value="yarn">
+
+```bash
+yarn add mongodb
+```
+
+  </Tab>
+
+  <Tab value="bun">
+
+```bash
+bun add mongodb
+```
+
+  </Tab>
+</Tabs>
+
+```ts title="imports.ts"
+import { Database } from "@tile.js/database";
+import { mongodbAdapter } from "@tile.js/database/adapters/mongodb";
+import { MongoClient } from "mongodb";
+```
+
+## Mongoose
+
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+  <Tab value="npm">
+
+```bash
+npm install mongoose
+```
+
+  </Tab>
+
+  <Tab value="pnpm">
+
+```bash
+pnpm add mongoose
+```
+
+  </Tab>
+
+  <Tab value="yarn">
+
+```bash
+yarn add mongoose
+```
+
+  </Tab>
+
+  <Tab value="bun">
+
+```bash
+bun add mongoose
+```
+
+  </Tab>
+</Tabs>
+
+```ts title="imports.ts"
+import mongoose from "mongoose";
+import { Database } from "@tile.js/database";
+import { mongooseAdapter } from "@tile.js/database/adapters/mongoose";
+```
+
+## Adapter padrão local
+
+O adapter local pode ser usado sem nenhum import extra:
+
+```ts
+import { Database } from "@tile.js/database";
+
+const database = new Database({ dbName: "app" });
+```
+
+Se você quiser instanciá-lo explicitamente, o `defaultAdapter` sai do entrypoint principal:
+
+```ts
+import { Database, defaultAdapter } from "@tile.js/database";
+
+const database = new Database({
+  storage: defaultAdapter({
+    dbName: "app",
+    storage: "workspace",
+  }),
+});
+```
+
+<Callout type="warning" title="Regra importante">
+Quando `storage` recebe um adapter customizado, não passe `dbName` nem `compression` no `new Database(...)`. Essas opções pertencem ao próprio adapter.
+</Callout>
+
+## Próximo passo
+
+<Cards>
+  <Card title="Comparar os adapters" href="/docs/adapters">
+    Entenda diferenças de uso, lifecycle, dependências e trade-offs.
+  </Card>
+</Cards>

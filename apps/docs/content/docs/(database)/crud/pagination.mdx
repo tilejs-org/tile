@@ -1,0 +1,84 @@
+---
+title: Paginação
+description: Use paginate com page, limit e sort sabendo exatamente o que a operação faz.
+icon: SquarePen
+---
+
+# Paginação
+
+A collection expõe `paginate()` para retornar um recorte paginado dos documentos.
+
+## Opções disponíveis
+
+<TypeTable
+  type={{
+    page: {
+      description: "Página atual.",
+      type: "number",
+      default: "1",
+    },
+    limit: {
+      description: "Quantidade de itens por página.",
+      type: "number",
+      default: "10",
+    },
+    sort: {
+      description: "Ordenação por campo em `asc` ou `desc`.",
+      type: 'Record<string, "asc" | "desc">',
+    },
+  }}
+/>
+
+## Exemplo básico
+
+```ts
+const page = await database.member.paginate({
+  page: 1,
+  limit: 10,
+});
+```
+
+## Com ordenação
+
+```ts
+const page = await database.member.paginate({
+  page: 2,
+  limit: 20,
+  sort: {
+    createdAt: "desc",
+  },
+});
+```
+
+## Retorno
+
+```ts
+{
+  items: [...],
+  total: 53,
+  page: 2,
+  limit: 20,
+  pages: 3,
+}
+```
+
+## O que `paginate()` não faz
+
+Hoje a API de paginação:
+
+- não recebe filtro próprio
+- não executa paginação nativa do MongoDB ou Mongoose
+- não substitui uma camada de query avançada
+
+<Callout type="warning" title="Paginação em memória">
+`paginate()` trabalha sobre a lista retornada pelo adapter. Em qualquer backend, isso significa que a operação segue a semântica do Tile e não uma paginação otimizada nativamente pelo banco.
+</Callout>
+
+## Quando usar
+
+- painéis administrativos pequenos e médios
+- listagens locais
+- fluxos internos previsíveis
+- protótipos e ferramentas
+
+Se você precisa de filtros complexos + paginação remota eficiente, vale construir esse trecho com o driver/ODM nativo da sua stack.

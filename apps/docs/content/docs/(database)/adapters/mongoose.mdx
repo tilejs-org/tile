@@ -1,0 +1,101 @@
+---
+title: Mongoose adapter
+description: Use o Tile Database por cima de uma instância mongoose ou de uma Connection.
+icon: Database
+---
+
+# Mongoose adapter
+
+O adapter de Mongoose aceita uma instância `mongoose` ou uma `Connection` compatível.
+
+Isso é útil quando a aplicação já usa Mongoose e você quer manter a API do Tile para schemas, collections e operações CRUD.
+
+## Exemplo de uso
+
+```ts title="src/database/index.ts"
+import mongoose from "mongoose";
+import { Database } from "@tile.js/database";
+import { mongooseAdapter } from "@tile.js/database/adapters/mongoose";
+import { memberSchema, type Member } from "./schema/member.ts";
+
+const connection = new Database({
+  storage: mongooseAdapter(mongoose, {
+    uri: "mongodb://127.0.0.1:27017",
+    dbName: "app",
+    manageConnection: true,
+  }),
+});
+
+export const database = Object.assign(connection, {
+  member: connection.collection<Member>("member", memberSchema),
+});
+```
+
+## Configuração
+
+<TypeTable
+  type={{
+    dbName: {
+      description: "Nome da database selecionada na conexão.",
+      type: "string",
+    },
+    uri: {
+      description: "URI usada quando o adapter gerencia a conexão.",
+      type: "string",
+    },
+    connectOptions: {
+      description: "Opções repassadas para `mongoose.connect()` ou `connection.openUri()`.",
+      type: "Record<string, any>",
+    },
+    persistSchema: {
+      description: "Persiste `schema.describe()` em uma collection interna.",
+      type: "boolean",
+      default: "true",
+    },
+    schemaCollection: {
+      description: "Collection interna usada para os metadados de schema.",
+      type: "string",
+      default: '"_tile_schemas"',
+    },
+    manageConnection: {
+      description: "Controla se o Tile conecta e desconecta a instância/connection do Mongoose.",
+      type: "boolean",
+      default: "true",
+    },
+  }}
+/>
+
+## O que o adapter aceita
+
+- uma instância `mongoose`
+- uma `Connection`
+- qualquer objeto compatível com o shape esperado pelo adapter
+
+Quando `dbName` está definido e a conexão suporta `useDb`, o adapter seleciona a database usando cache interno da própria connection.
+
+## Lifecycle
+
+- com instância `mongoose`, `connect()` pode chamar `mongoose.connect(uri, options)`
+- com `Connection`, `connect()` pode chamar `openUri(uri, options)`
+- se a conexão já existir, o adapter apenas aguarda a instância ficar pronta
+- `disconnect()` delega para `disconnect()`, `close()` ou `destroy()`, conforme o objeto recebido
+
+<Callout type="warning" title="Mongoose aqui não vira Model API">
+Mesmo sobre Mongoose, a semântica principal continua vindo do Tile: `Schema`, `Collection`, filtros simples, operadores suportados em `updateOne()` e paginação seguem as regras da biblioteca.
+</Callout>
+
+## Limitações importantes
+
+Assim como no adapter de MongoDB:
+
+- `find()` continua operando pela semântica do Tile
+- `paginate()` não vira paginação nativa do Mongoose
+- filtros complexos do Mongoose não passam a existir automaticamente
+
+## Próximo passo
+
+<Cards>
+  <Card title="Schema" href="/docs/schema">
+    Veja como modelar os documentos que serão persistidos por esse adapter.
+  </Card>
+</Cards>

@@ -1,0 +1,5 @@
+{
+  "title": "Iniciando",
+  "icon": "Rocket",
+  "pages": ["index", "quickstart"]
+}

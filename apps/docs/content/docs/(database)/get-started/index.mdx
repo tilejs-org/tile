@@ -1,0 +1,129 @@
+---
+title: Iniciando
+description: Comece pelo fluxo certo e entenda a arquitetura do @tile.js/database.
+icon: Rocket
+---
+
+import { File, Folder, Files } from "fumadocs-ui/components/files";
+import { DatabaseIcon, Download, FileCodeIcon, TableProperties } from "lucide-react";
+
+# Iniciando
+
+Se é a sua primeira vez com o `@tile.js/database`, a melhor experiência é começar pelo adapter local, validar o fluxo da sua aplicação e só depois decidir se vale usar MongoDB, Mongoose ou um adapter customizado.
+
+<Callout type="tip" title="Ordem recomendada de leitura">
+`Instalação` → `Projeto em 5 minutos` → `Database` → `Schema` → `Collections` → `CRUD`
+</Callout>
+
+## O que você vai montar primeiro
+
+<Files>
+  <Folder name="src" defaultOpen>
+    <Folder name="database" defaultOpen>
+      <File name="index.ts" />
+      <Folder name="schema" defaultOpen>
+        <File name="member.ts" />
+      </Folder>
+    </Folder>
+    <File name="index.ts" />
+  </Folder>
+  <File name="package.json" />
+  <File name="tsconfig.json" />
+</Files>
+
+Nesse formato:
+
+- `src/index.ts` usa a database no fluxo principal da aplicação
+- `src/database/index.ts` centraliza a collection e a instância principal
+- `src/database/schema/member.ts` concentra a interface e o schema do domínio
+
+## Em 3 etapas
+
+<Cards cols={3}>
+  <Card icon={<Download />} title="1. Instale o pacote" href="/docs/installation">
+    Instale `@tile.js/database` e, se necessário, as dependências dos adapters remotos.
+  </Card>
+
+  <Card icon={<TableProperties />} title="2. Modele o schema" href="/docs/schema">
+    Descreva seus documentos com tipos, defaults, validações e índices únicos.
+  </Card>
+
+  <Card icon={<DatabaseIcon />} title="3. Registre a collection" href="/docs/collections">
+    Crie a instância de `Database` e exponha collections prontas para uso no app.
+  </Card>
+</Cards>
+
+## Exemplo mínimo
+
+<Tabs items={["src/index.ts", "src/database/index.ts", "src/database/schema/member.ts"]}>
+  <Tab value="src/index.ts">
+
+```ts title="src/index.ts"
+import { database } from "./database/index.ts";
+
+await database.connect();
+
+const created = await database.member.create({
+  name: " Israel ",
+  email: "ISRAEL@GMAIL.COM",
+});
+
+console.log(created);
+
+await database.disconnect();
+```
+
+  </Tab>
+
+  <Tab value="src/database/index.ts">
+
+```ts title="src/database/index.ts"
+import { Database } from "@tile.js/database";
+import { memberSchema, type Member } from "./schema/member.ts";
+
+const connection = new Database({
+  dbName: "app",
+});
+
+export const database = Object.assign(connection, {
+  member: connection.collection<Member>("member", memberSchema),
+});
+```
+
+  </Tab>
+
+  <Tab value="src/database/schema/member.ts">
+
+```ts title="src/database/schema/member.ts"
+import { Schema } from "@tile.js/database";
+
+export interface Member {
+  _id?: string;
+  name: string;
+  email: string;
+}
+
+export const memberSchema = new Schema<Member>({
+  name: { type: String, required: true, trim: true },
+  email: { type: String, required: true, unique: true, lowercase: true },
+});
+```
+
+  </Tab>
+</Tabs>
+
+<Callout type="info">
+No adapter padrão, a pasta `.tile/database/...` só aparece na primeira operação de escrita ou quando uma collection precisa persistir seus metadados.
+</Callout>
+
+## Próximos passos
+
+<Cards>
+  <Card icon={<FileCodeIcon />} title="Projeto em 5 minutos" href="/docs/get-started/quickstart">
+    Monte um setup mais organizado com `src/database/index.ts`, schema dedicado e uma collection real.
+  </Card>
+
+  <Card icon={<DatabaseIcon />} title="Entender a instância principal" href="/docs/database">
+    Veja como a classe `Database` controla adapter, lifecycle, logger e cache.
+  </Card>
+</Cards>

@@ -1,0 +1,87 @@
+---
+title: Adapters
+description: Escolha o backend de persistência certo sem trocar a API principal do Tile.
+icon: Boxes
+---
+
+import { BoxesIcon, DatabaseIcon, TableProperties } from "lucide-react";
+
+# Adapters
+
+O sistema de adapters separa a API de documentos do backend de persistência.
+
+Em outras palavras, `Database`, `Schema` e `Collection` continuam os mesmos, enquanto o storage pode ser local, MongoDB, Mongoose ou qualquer implementação compatível com `StorageAdapter`.
+
+## Comparação rápida
+
+| Adapter | Quando usar | Dependências extras | Persistência de schema | Lifecycle próprio |
+| --- | --- | --- | --- | --- |
+| Default (BSON local) | desenvolvimento local, CLIs, apps pequenas e médias | nenhuma | `_schema.json` em disco | flush local |
+| MongoDB | quando você quer usar o driver oficial | `mongodb` | `_tile_schemas` opcional | `manageClient` |
+| Mongoose | quando o projeto já depende de Mongoose | `mongoose` | `_tile_schemas` opcional | `manageConnection` |
+| Custom | integrações próprias | depende do seu backend | depende do adapter | depende do adapter |
+
+## Formas de importar
+
+<Tabs items={["subpaths", "barrel"]}>
+  <Tab value="subpaths">
+
+```ts
+import { defaultAdapter } from "@tile.js/database";
+import { mongodbAdapter } from "@tile.js/database/adapters/mongodb";
+import { mongooseAdapter } from "@tile.js/database/adapters/mongoose";
+```
+
+  </Tab>
+
+  <Tab value="barrel">
+
+```ts
+import {
+  defaultAdapter,
+  mongodbAdapter,
+  mongooseAdapter,
+} from "@tile.js/database/adapters";
+```
+
+  </Tab>
+</Tabs>
+
+<Callout type="warning" title="Semântica do Tile continua valendo">
+Os adapters trocam o backend, mas não transformam a biblioteca em um ODM nativo do MongoDB ou do Mongoose. Filtros continuam simples, e operações como `find()`, `countDocuments()`, `deleteMany()` e `paginate()` seguem a semântica do Tile.
+</Callout>
+
+## Qual adapter escolher?
+
+<Cards cols={2}>
+  <Card icon={<DatabaseIcon />} title="Default (BSON local)" href="/docs/adapters/default">
+    Melhor opção para começar, prototipar, rodar localmente e armazenar dados junto da aplicação.
+  </Card>
+
+  <Card icon={<DatabaseIcon />} title="MongoDB" href="/docs/adapters/mongodb">
+    Boa escolha quando você já usa o driver oficial e quer manter a API do Tile por cima.
+  </Card>
+
+  <Card icon={<BoxesIcon />} title="Mongoose" href="/docs/adapters/mongoose">
+    Útil quando o projeto já orbita em torno do ecossistema Mongoose.
+  </Card>
+
+  <Card icon={<TableProperties />} title="Custom" href="/docs/adapters/custom">
+    Ideal quando você precisa persistir em outro backend mantendo o contrato do Tile.
+  </Card>
+</Cards>
+
+## O que permanece igual entre adapters
+
+- `Schema` continua sendo o centro da validação e normalização
+- `_id`, `__v` e timestamps continuam seguindo as regras do Tile
+- `create`, `findOne`, `updateOne`, `upsert`, `deleteMany` e `paginate` continuam com a mesma API
+- `collection()` e `model()` continuam funcionando da mesma forma
+
+## Próximo passo
+
+<Cards>
+  <Card title="Ver o adapter default em detalhes" href="/docs/adapters/default">
+    Entenda armazenamento em BSON, `workspace`, `global`, índices e flush.
+  </Card>
+</Cards>

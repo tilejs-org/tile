@@ -1,0 +1,101 @@
+---
+title: Organização da camada de dados
+description: Escolha uma estrutura simples, modular ou compartilhada para evoluir suas collections.
+icon: Table
+---
+
+import { File, Folder, Files } from "fumadocs-ui/components/files";
+
+# Organização da camada de dados
+
+A melhor estrutura é a menor estrutura que ainda deixa seu projeto claro.
+
+## Padrões recomendados
+
+<Tabs items={["simples", "modular", "monorepo"]}>
+  <Tab value="simples">
+
+<Files>
+  <Folder name="src" defaultOpen>
+    <Folder name="database" defaultOpen>
+      <File name="index.ts" />
+      <Folder name="schema" defaultOpen>
+        <File name="member.ts" />
+      </Folder>
+    </Folder>
+    <File name="index.ts" />
+  </Folder>
+</Files>
+
+É o padrão sugerido pela documentação: `src/index.ts` usa a database, `src/database/index.ts` centraliza a instância e `src/database/schema/member.ts` guarda a interface com o schema.
+
+  </Tab>
+
+  <Tab value="modular">
+
+<Files>
+  <Folder name="src" defaultOpen>
+    <Folder name="database" defaultOpen>
+      <File name="index.ts" />
+      <Folder name="schema" defaultOpen>
+        <File name="member.ts" />
+        <File name="order.ts" />
+      </Folder>
+    </Folder>
+    <Folder name="modules" defaultOpen>
+      <Folder name="auth" defaultOpen>
+        <File name="service.ts" />
+      </Folder>
+      <Folder name="billing" defaultOpen>
+        <File name="service.ts" />
+      </Folder>
+    </Folder>
+    <File name="index.ts" />
+  </Folder>
+</Files>
+
+Boa escolha quando os domínios crescem, mas você ainda quer manter a database centralizada em `src/database/index.ts`.
+
+  </Tab>
+
+  <Tab value="monorepo">
+
+<Files>
+  <Folder name="packages" defaultOpen>
+    <Folder name="data" defaultOpen>
+      <Folder name="src" defaultOpen>
+        <Folder name="database" defaultOpen>
+          <File name="index.ts" />
+          <Folder name="schema" defaultOpen>
+            <File name="member.ts" />
+          </Folder>
+        </Folder>
+        <File name="index.ts" />
+      </Folder>
+    </Folder>
+  </Folder>
+  <Folder name="apps" defaultOpen>
+    <Folder name="api" defaultOpen>
+      <File name="src/index.ts" />
+    </Folder>
+    <Folder name="worker" defaultOpen>
+      <File name="src/index.ts" />
+    </Folder>
+  </Folder>
+</Files>
+
+Útil quando múltiplas aplicações compartilham a mesma camada de dados e o mesmo contrato de domínio.
+
+  </Tab>
+</Tabs>
+
+## Regras práticas
+
+- mantenha `Schema` perto do domínio que ele representa
+- exponha collections prontas em um ponto central (`src/database/index.ts` ou módulo equivalente)
+- evite espalhar `new Database(...)` por vários arquivos
+- concentre regras de negócio em serviços, não dentro dos schemas
+
+<Callout type="tip">
+Se você ainda está começando, prefira o padrão **simples**. Ele já cobre muito bem a maioria dos projetos e combina com o fluxo sugerido nesta documentação.
+</Callout>

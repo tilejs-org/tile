@@ -1,0 +1,86 @@
+---
+title: CRUD
+description: Entenda a superfície pública da Collection para criar, ler, atualizar, remover e paginar documentos.
+icon: SquarePen
+---
+
+import { SquarePen, Table } from "lucide-react";
+
+# CRUD
+
+Depois de registrar uma collection, a aplicação passa a trabalhar por uma API assíncrona e previsível.
+
+## Resumo dos métodos
+
+<TypeTable
+  type={{
+    create: {
+      description: "Insere um documento.",
+      type: "Promise<T & InternalDocumentFields>",
+    },
+    findOne: {
+      description: "Busca o primeiro documento correspondente ao filtro.",
+      type: "Promise<T | null>",
+    },
+    find: {
+      description: "Retorna todos os documentos que correspondem ao filtro.",
+      type: "Promise<T[]>",
+    },
+    findOneByID: {
+      description: "Busca um documento pelo `_id`.",
+      type: "Promise<T | null>",
+    },
+    findOneById: {
+      description: "Alias de `findOneByID`.",
+      type: "Promise<T | null>",
+    },
+    updateOne: {
+      description: "Atualiza o primeiro documento encontrado.",
+      type: "Promise<T | null>",
+    },
+    upsert: {
+      description: "Atualiza se encontrar; cria se não existir.",
+      type: "Promise<T>",
+    },
+    deleteOne: {
+      description: "Remove o primeiro documento encontrado.",
+      type: "Promise<boolean>",
+    },
+    deleteMany: {
+      description: "Remove vários documentos ou todos os documentos da collection.",
+      type: "Promise<number>",
+    },
+    countDocuments: {
+      description: "Conta documentos com ou sem filtro.",
+      type: "Promise<number>",
+    },
+    paginate: {
+      description: "Retorna documentos paginados.",
+      type: "Promise<PaginateResult<T>>",
+    },
+    describeSchema: {
+      description: "Retorna a descrição amigável do schema da collection.",
+      type: "SchemaDescription",
+    },
+  }}
+/>
+
+<Callout type="info" title="Modelo de consulta do Tile">
+Os filtros são simples e baseados em igualdade por campo. Não há suporte nativo a operadores de query como `$gt`, `$lt`, `$in`, `$or` ou agregações.
+</Callout>
+
+## Como navegar por esta seção
+
+<Cards cols={3}>
+  <Card icon={<Table />} title="Leitura" href="/docs/crud/reading">
+    `findOne`, `find`, `findOneByID`, `countDocuments` e filtros por dot-path.
+  </Card>
+
+  <Card icon={<SquarePen />} title="Escrita e remoção" href="/docs/crud/writing">
+    `create`, `updateOne`, `upsert`, `deleteOne`, `deleteMany` e operadores de update.
+  </Card>
+
+  <Card icon={<SquarePen />} title="Paginação" href="/docs/crud/pagination">
+    `paginate`, ordenação e limites da operação em todos os adapters.
+  </Card>
+</Cards>

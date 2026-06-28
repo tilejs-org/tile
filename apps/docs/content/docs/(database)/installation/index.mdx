@@ -1,0 +1,117 @@
+---
+title: Instalação
+description: Instale o núcleo do Tile Database e prepare seu ambiente para o adapter certo.
+icon: Download
+---
+
+import { BoxesIcon, DatabaseIcon } from "lucide-react";
+
+# Instalação
+
+O `@tile.js/database` já inclui o núcleo da biblioteca e o adapter local em BSON.
+
+Você só precisa instalar dependências extras se quiser trabalhar com **MongoDB** ou **Mongoose**.
+
+## Pacote principal
+
+<Tabs items={["bun", "npm", "pnpm", "yarn"]}>
+  <Tab value="bun">
+
+```bash
+bun add @tile.js/database
+```
+
+  </Tab>
+
+  <Tab value="npm">
+
+```bash
+npm install @tile.js/database
+```
+
+  </Tab>
+
+  <Tab value="pnpm">
+
+```bash
+pnpm add @tile.js/database
+```
+
+  </Tab>
+
+  <Tab value="yarn">
+
+```bash
+yarn add @tile.js/database
+```
+
+  </Tab>
+</Tabs>
+
+## Perfis de instalação
+
+<Cards cols={3}>
+  <Card title="BSON local" href="/docs/adapters/default">
+    Nenhuma dependência extra. Ideal para começar rápido, CLIs e armazenamento local.
+  </Card>
+
+  <Card icon={<DatabaseIcon />} title="MongoDB" href="/docs/adapters/mongodb">
+    Instale também `mongodb` se quiser usar o driver oficial ou um client compatível.
+  </Card>
+
+  <Card icon={<BoxesIcon />} title="Mongoose" href="/docs/adapters/mongoose">
+    Instale `mongoose` se você já trabalha com o ecossistema Mongoose.
+  </Card>
+</Cards>
+
+## Requisitos
+
+| Requisito | Versão recomendada |
+| --- | --- |
+| Node.js | `>= 24.x` |
+| Bun | `>= 1.x` |
+| TypeScript | `>= 5.x` |
+
+## Verificando a instalação
+
+```ts title="index.ts"
+import { Database, Schema } from "@tile.js/database";
+
+console.log("Tile Database pronto para uso");
+```
+
+<Tabs items={["bun", "tsx"]}>
+  <Tab value="bun">
+
+```bash
+bun index.ts
+```
+
+  </Tab>
+
+  <Tab value="tsx">
+
+```bash
+npx tsx index.ts
+```
+
+  </Tab>
+</Tabs>
+
+Se o arquivo executar sem erro de importação, seu ambiente já está pronto para seguir.
+
+<Callout type="tip">
+No adapter padrão, a pasta `.tile` só é criada quando a aplicação realmente precisa persistir dados ou metadados de collection.
+</Callout>
+
+## Próximos passos
+
+<Cards>
+  <Card title="Dependências por adapter" href="/docs/installation/adapter-dependencies">
+    Veja exatamente quais pacotes extras instalar e quais imports usar em cada cenário.
+  </Card>
+
+  <Card title="Começar do jeito certo" href="/docs/get-started/quickstart">
+    Monte um projeto funcional com schema, database e collection em poucos minutos.
+  </Card>
+</Cards>

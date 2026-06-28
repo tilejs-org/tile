@@ -1,0 +1,127 @@
+---
+title: Projeto em 5 minutos
+description: Monte um projeto real com schema, database e uma collection pronta para uso.
+icon: FileCode
+---
+
+import { File, Folder, Files } from "fumadocs-ui/components/files";
+import { DatabaseIcon, SquarePen, TableProperties } from "lucide-react";
+
+# Projeto em 5 minutos
+
+Nesta página você vai montar um setup simples, organizado e fácil de evoluir com `src/index.ts` como ponto de uso, `src/database/index.ts` como ponto central da database e `src/database/schema/member.ts` para o domínio.
+
+## Estrutura sugerida
+
+<Files>
+  <Folder name="src" defaultOpen>
+    <Folder name="database" defaultOpen>
+      <File name="index.ts" />
+      <Folder name="schema" defaultOpen>
+        <File name="member.ts" />
+      </Folder>
+    </Folder>
+    <File name="index.ts" />
+  </Folder>
+</Files>
+
+## 1. Defina a interface e o schema
+
+```ts title="src/database/schema/member.ts"
+import { Schema } from "@tile.js/database";
+
+export interface Member {
+  _id?: string;
+  name: string;
+  email: string;
+  verified?: boolean;
+}
+
+export const memberSchema = new Schema<Member>({
+  name: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    lowercase: true,
+  },
+  verified: {
+    type: Boolean,
+    default: false,
+  },
+});
+```
+
+## 2. Configure a collection e centralize a database
+
+```ts title="src/database/index.ts"
+import { Database } from "@tile.js/database";
+import { memberSchema, type Member } from "./schema/member.ts";
+
+const connection = new Database({
+  dbName: "app",
+});
+
+export const database = Object.assign(connection, {
+  member: connection.collection<Member>("member", memberSchema),
+});
+```
+
+## 3. Use a database na aplicação
+
+```ts title="src/index.ts"
+import { database } from "./database/index.ts";
+
+await database.connect();
+
+const member = await database.member.create({
+  name: "Ada Lovelace",
+  email: "ADA@EXAMPLE.COM",
+});
+
+const found = await database.member.findOne({
+  email: "ada@example.com",
+});
+
+await database.member.updateOne(
+  { _id: member._id },
+  {
+    $set: { verified: true },
+  },
+);
+
+console.log(found);
+
+await database.disconnect();
+```
+
+## Resultado esperado
+
+- `name` será normalizado com `trim`
+- `email` será salvo em minúsculas por causa de `lowercase`
+- `verified` receberá `false` por `default`
+- `_id`, `__v` e timestamps serão adicionados automaticamente por padrão
+
+<Callout type="tip" title="No modo local">
+Com o adapter padrão, os dados ficam em `.tile/database/<dbName>/<collection>/`. Você não precisa criar essa pasta manualmente.
+</Callout>
+
+## Para onde ir depois
+
+<Cards>
+  <Card icon={<TableProperties />} title="Aprofundar em Schema" href="/docs/schema">
+    Entenda opções de campo, limitações do schema e comportamento de objetos aninhados.
+  </Card>
+
+  <Card icon={<DatabaseIcon />} title="Aprofundar em Database" href="/docs/database">
+    Veja configurações como `storage`, `compression`, `logger` e lifecycle.
+  </Card>
+
+  <Card icon={<SquarePen />} title="Dominar o CRUD" href="/docs/crud/writing">
+    Continue com `create`, `updateOne`, `upsert`, remoções e operadores.
+  </Card>
+</Cards>

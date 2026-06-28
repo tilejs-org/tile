@@ -1,0 +1,148 @@
+---
+title: Schema
+description: Defina a estrutura, defaults, normalização e validação dos documentos.
+icon: TableProperties
+---
+
+import { Table, TableProperties } from "lucide-react";
+
+# Schema
+
+O `Schema` define a estrutura dos documentos de uma collection.
+
+É nele que você descreve:
+
+- tipos de campos
+- obrigatoriedade
+- defaults
+- índices únicos
+- normalização de strings
+- metadados e introspecção
+
+## Exemplo completo
+
+```ts title="src/database/schema/member.ts"
+import { Schema } from "@tile.js/database";
+
+interface Member {
+  _id?: string;
+  profile: {
+    name: string;
+    email: string;
+  };
+  role?: "admin" | "member";
+  visits?: number;
+}
+
+export const memberSchema = new Schema<Member>(
+  {
+    profile: {
+      name: {
+        type: String,
+        required: true,
+        trim: true,
+      },
+      email: {
+        type: String,
+        required: true,
+        unique: true,
+        lowercase: true,
+      },
+    },
+    role: {
+      type: String,
+      enum: ["admin", "member"],
+      default: "member",
+    },
+    visits: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+  },
+  {
+    timestamps: true,
+    versionKey: true,
+  },
+);
+```
+
+## Opções do schema
+
+<TypeTable
+  type={{
+    _id: {
+      description: "Controla a exposição do campo interno `_id` na descrição do schema.",
+      type: "boolean",
+      default: "true",
+    },
+    timestamps: {
+      description: "Adiciona `createdAt` e `updatedAt` automaticamente.",
+      type: "boolean",
+      default: "true",
+    },
+    versionKey: {
+      description: "Adiciona o campo interno `__v`.",
+      type: "boolean",
+      default: "true",
+    },
+    collection: {
+      description: "Metadado lógico usado na descrição do schema.",
+      type: "string",
+    },
+  }}
+/>
+
+<Callout type="warning" title="Defaults importantes">
+`timestamps` e `versionKey` são `true` por padrão. Além disso, `collection` é apenas metadado de introspecção: ela não redefine o nome real usado em `database.collection("...")`.
+</Callout>
+
+## Campos internos
+
+| Campo | Quando aparece | Função |
+| --- | --- | --- |
+| `_id` | por padrão | identificador do documento |
+| `__v` | com `versionKey !== false` | controle interno de versão |
+| `createdAt` | com `timestamps !== false` | data de criação |
+| `updatedAt` | com `timestamps !== false` | data da última atualização |
+
+## Introspecção com `describe()`
+
+```ts
+console.log(memberSchema.describe());
+```
+
+Saída resumida:
+
+```ts
+{
+  fields: {
+    _id: { type: "String", unique: true, auto: true, required: true },
+    "profile.name": { type: "String", required: true, trim: true },
+    "profile.email": { type: "String", required: true, unique: true, lowercase: true },
+    role: { type: "String", default: "member", enum: ["admin", "member"] },
+    visits: { type: "Number", default: 0, min: 0 },
+    __v: { type: "Number", default: 0, required: true },
+  },
+  timestamps: true,
+  collection: undefined,
+}
+```
+
+## O que vale lembrar
+
+- construtores como `String`, `Number`, `Boolean`, `Date`, `Array` e `Object` são aceitos
+- strings como `"String"` e `"Number"` também são aceitas
+- objetos aninhados são convertidos para caminhos com ponto (`profile.email`)
+
+## Próximos passos
+
+<Cards>
+  <Card icon={<TableProperties />} title="Campos e validação" href="/docs/schema/fields">
+    Veja opções de campo, normalização, tipos suportados e limitações reais do schema.
+  </Card>
+
+  <Card icon={<Table />} title="Collections" href="/docs/collections">
+    Depois de modelar o schema, registre a collection na instância `Database`.
+  </Card>
+</Cards>
