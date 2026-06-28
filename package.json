@@ -1,17 +1,17 @@
 {
   "name": "@tile.js/root",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "license": "MIT",
   "private": true,
   "scripts": {
-    "bench": "turbo run bench",
     "dev": "turbo run dev --parallel --filter=./packages/*",
     "dev:all": "turbo run dev --parallel",
     "build": "turbo run build --filter=./packages/*",
     "build:all": "turbo run build",
     "test": "turbo run test",
     "lint": "turbo run lint",
-    "typecheck": "turbo run typecheck"
+    "typecheck": "turbo run typecheck",
+    "create:package": "bun scripts/create/package/index.ts"
   },
   "devDependencies": {
     "@types/bun": "catalog:",
@@ -28,7 +28,6 @@
   "workspaces": [
     "apps/*",
     "api",
-    "benchmarks/*",
     "examples/*",
     "packages/*",
     "tools/*"

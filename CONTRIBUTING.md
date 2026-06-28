@@ -20,6 +20,7 @@ Este projeto é um monorepo mantido com Bun e organizado em múltiplos pacotes. 
 - Para mudanças grandes, abra uma discussão antes de começar a implementação.
 - Mantenha as alterações focadas em um único objetivo.
 - Evite mudanças não relacionadas no mesmo Pull Request.
+- Para criar um package novo (com template pré-configurado) use: `bun create:package <package-name>`.
 
 ---
 > [!important]

@@ -21,14 +21,7 @@
       "dependsOn": ["^build"],
       "outputs": []
     },
-    "bench": {
-      "cache": false,
-      "outputs": []
-    },
     "@tile.js/config#build": {
-      "outputs": []
-    },
-    "@tile.js/bench/database#build": {
       "outputs": []
     }
   }
