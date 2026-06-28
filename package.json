@@ -31,8 +31,7 @@
     "benchmarks/*",
     "examples/*",
     "packages/*",
-    "tools/*",
-    "website"
+    "tools/*"
   ],
   "catalog": {
     "@types/node": "^24",

@@ -8,7 +8,7 @@ interface BenchmarkUser {
 }
 
 const DOCUMENTS = 10_000;
-const RUNS = 5;
+const RUNS = 10;
 
 const schema = new Schema<BenchmarkUser>({
   email: { type: String },
