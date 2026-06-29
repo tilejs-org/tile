@@ -1,6 +1,6 @@
 {
   "name": "@tile.js/root",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "license": "MIT",
   "private": true,
   "scripts": {
@@ -14,6 +14,7 @@
     "create:package": "bun scripts/create/package/index.ts"
   },
   "devDependencies": {
+    "@tile.js/cli": "link:@tile.js/cli",
     "@types/bun": "catalog:",
     "@types/node": "catalog:",
     "turbo": "catalog:",
@@ -37,7 +38,7 @@
     "@types/bun": "latest",
     "@tile.js/config": "*",
     "turbo": "^2",
-    "typescript": "^5",
+    "typescript": "^6",
     "tsx": "^4"
   },
   "engines": {
