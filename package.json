@@ -14,7 +14,6 @@
     "create:package": "bun scripts/create/package/index.ts"
   },
   "devDependencies": {
-    "@tile.js/cli": "link:@tile.js/cli",
     "@types/bun": "catalog:",
     "@types/node": "catalog:",
     "turbo": "catalog:",
