@@ -1,5 +1,5 @@
 @import 'tailwindcss';
-@import 'fumadocs-ui/css/solar.css';
+@import '../../public/styles/tile.css';
 @import 'fumadocs-ui/css/preset.css';
 
 html {

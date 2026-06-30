@@ -21,6 +21,7 @@
 
 ## Pacotes NPM:
 
+- [@tile.js/cli](https://www.npmjs.com/package/@tile.js/cli)
 - [@tile.js/database](https://www.npmjs.com/package/@tile.js/database)
 
 ## Links

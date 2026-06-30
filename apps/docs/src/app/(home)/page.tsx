@@ -77,12 +77,12 @@ const quickLinks = [
 export default function Page() {
   return (
     <main className="relative overflow-hidden">
-      <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,_color-mix(in_oklab,_var(--color-fd-primary)_12%,_transparent)_0%,_transparent_55%)]" />
+      <div className="absolute inset-0 -z-10" />
 
       <section className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-7xl items-center px-6 py-20 md:py-24">
         <div className="grid w-full items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
           <div>
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-black/10 bg-black/5 px-3 py-1 text-xs font-medium dark:border-white/10 dark:bg-white/5">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-black/10 bg-black/0 px-3 py-1 text-xs font-medium dark:border-white/10 dark:bg-white/0">
               <Sparkles className="size-3.5" />
               <span>@tile.js/database já disponível</span>
             </div>
@@ -114,34 +114,34 @@ export default function Page() {
 
               <Link
                 href="/docs/installation"
-                className="inline-flex items-center justify-center gap-2 rounded-xl border border-black/15 px-5 py-3 text-sm font-semibold transition hover:bg-black/5 dark:border-white/15 dark:hover:bg-white/5"
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-black/15 px-5 py-3 text-sm font-semibold transition hover:bg-black/0 dark:border-white/15 dark:hover:bg-white/0"
               >
                 Instalar agora
               </Link>
 
               <Link
                 href="/docs"
-                className="inline-flex items-center justify-center gap-2 rounded-xl border border-transparent px-5 py-3 text-sm font-medium text-black/70 transition hover:bg-black/5 dark:text-white/70 dark:hover:bg-white/5"
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-transparent px-5 py-3 text-sm font-medium text-black/70 transition hover:bg-black/0 dark:text-white/70 dark:hover:bg-white/0"
               >
                 Explorar docs
               </Link>
             </div>
 
             <div className="mt-8 flex flex-wrap gap-3 text-sm text-black/65 dark:text-white/65">
-              <div className="rounded-full border border-black/10 bg-black/5 px-3 py-1.5 dark:border-white/10 dark:bg-white/5">
+              <div className="rounded-full border border-black/10 bg-black/0 px-3 py-1.5 dark:border-white/10 dark:bg-white/0">
                 Adapter padrão local
               </div>
-              <div className="rounded-full border border-black/10 bg-black/5 px-3 py-1.5 dark:border-white/10 dark:bg-white/5">
+              <div className="rounded-full border border-black/10 bg-black/0 px-3 py-1.5 dark:border-white/10 dark:bg-white/0">
                 MongoDB e Mongoose opcionais
               </div>
-              <div className="rounded-full border border-black/10 bg-black/5 px-3 py-1.5 dark:border-white/10 dark:bg-white/5">
+              <div className="rounded-full border border-black/10 bg-black/0 px-3 py-1.5 dark:border-white/10 dark:bg-white/0">
                 Node.js 24+ e Bun
               </div>
             </div>
           </div>
 
           <div className="relative">
-            <div className="overflow-hidden rounded-3xl border border-black/10 bg-white/70 shadow-2xl shadow-black/5 backdrop-blur dark:border-white/10 dark:bg-white/5 dark:shadow-black/20">
+            <div className="overflow-hidden rounded-3xl border border-black/10 bg-white/70 shadow-2xl shadow-black/0 backdrop-blur dark:border-white/10 dark:bg-white/0 dark:shadow-black/20">
               <div className="border-b border-black/10 px-5 py-4 dark:border-white/10">
                 <div className="flex items-center gap-2 text-sm font-semibold">
                   <DatabaseIcon className="size-4 text-primary" />
@@ -163,14 +163,14 @@ export default function Page() {
                 </div>
 
                 <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                  <div className="rounded-2xl border border-black/10 bg-black/[0.03] p-4 dark:border-white/10 dark:bg-white/[0.03]">
+                  <div className="rounded-2xl border border-black/10 bg-black/0 p-4 dark:border-white/10 dark:bg-white/0">
                     <p className="text-sm font-semibold">O que já está pronto</p>
                     <p className="mt-2 text-sm text-black/65 dark:text-white/65">
                       Schema, collections, CRUD, paginação, lifecycle e documentação atualizada.
                     </p>
                   </div>
 
-                  <div className="rounded-2xl border border-black/10 bg-black/[0.03] p-4 dark:border-white/10 dark:bg-white/[0.03]">
+                  <div className="rounded-2xl border border-black/10 bg-black/0 p-4 dark:border-white/10 dark:bg-white/0">
                     <p className="text-sm font-semibold">Por que começar aqui</p>
                     <p className="mt-2 text-sm text-black/65 dark:text-white/65">
                       Hoje esta é a área mais madura do ecossistema e o melhor ponto de entrada para entender o Tile.JS.
@@ -188,7 +188,7 @@ export default function Page() {
           {highlights.map(({ title, description, icon: IconComponent }) => (
             <article
               key={title}
-              className="rounded-2xl border border-black/10 bg-black/[0.03] p-6 dark:border-white/10 dark:bg-white/[0.03]"
+              className="rounded-2xl border border-black/10 bg-black/0 p-6 dark:border-white/10 dark:bg-white/0"
             >
               <div className="mb-4 inline-flex rounded-xl border border-black/10 bg-white/80 p-2 dark:border-white/10 dark:bg-white/10">
                 <IconComponent className="size-5 text-primary" />
@@ -231,9 +231,9 @@ export default function Page() {
             <Link
               key={title}
               href={href}
-              className="group rounded-2xl border border-black/10 bg-white/70 p-5 transition hover:-translate-y-0.5 hover:border-primary/30 hover:bg-white dark:border-white/10 dark:bg-white/[0.03] dark:hover:bg-white/[0.05]"
+              className="group rounded-2xl border border-black/10 bg-white/70 p-5 transition hover:-translate-y-0.5 hover:border-primary/30 hover:bg-white dark:border-white/10 dark:bg-white/0 dark:hover:bg-white/0"
             >
-              <div className="mb-4 inline-flex rounded-xl border border-black/10 bg-black/[0.03] p-2 dark:border-white/10 dark:bg-white/[0.05]">
+              <div className="mb-4 inline-flex rounded-xl border border-black/10 bg-black/0 p-2 dark:border-white/10 dark:bg-white/0">
                 <IconComponent className="size-5 text-primary" />
               </div>
               <h3 className="font-semibold">{title}</h3>
