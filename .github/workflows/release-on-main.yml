@@ -55,18 +55,11 @@ jobs:
             </p>
           </div>
 
-          ---
-
-          ## 📝 Commit
           ${{ steps.commit.outputs.message }}
 
-          ## 👤 Author
-          ${{ steps.commit.outputs.author }}
+          **Author:** ${{ steps.commit.outputs.author }}
 
-          ## 🔖 Hash
-          ${{ steps.commit.outputs.hash }}
-
-          ---
+          **Hash:** ${{ steps.commit.outputs.hash }}
 
           ## Links
 
@@ -79,10 +72,6 @@ jobs:
 
           <p align="center">
             Copyright &copy; 2026, Israel R. Jatobá.
-          </p>
-
-          <p align="center">
-          <img src="https://img.shields.io/github/license/tilejs-org/tile?style=for-the-badge" />
           </p>
           EOF
 
