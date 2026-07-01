@@ -1,6 +1,6 @@
 {
   "name": "@tile.js/root",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "license": "MIT",
   "private": true,
   "scripts": {
@@ -11,7 +11,7 @@
     "test": "turbo run test",
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
-    "create:package": "bun scripts/create/package/index.ts"
+    "create": "bun x tile create"
   },
   "devDependencies": {
     "@types/bun": "catalog:",
@@ -33,9 +33,9 @@
     "tools/*"
   ],
   "catalog": {
-    "@types/node": "^24",
+    "@types/node": "latest",
     "@types/bun": "latest",
-    "@tile.js/config": "*",
+    "@tile.js/config": "latest",
     "turbo": "^2",
     "typescript": "^6",
     "tsx": "^4"

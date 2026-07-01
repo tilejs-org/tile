@@ -22,9 +22,8 @@
   },
   "keywords": [],
   "devDependencies": {
-    "@types/bun": "catalog:",
-    "@tile.js/config": "catalog:",
-    "typescript": "catalog:"
+    "@tile.js/config": "latest",
+    "typescript": "latest"
   },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -36,7 +35,8 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "template"
   ],
   "imports": {
     "#package": [

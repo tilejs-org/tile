@@ -59,9 +59,9 @@
     "dist"
   ],
   "devDependencies": {
-    "@types/bun": "catalog:",
-    "@tile.js/config": "catalog:",
-    "typescript": "catalog:"
+    "@types/bun": "latest",
+    "@tile.js/config": "latest",
+    "typescript": "latest"
   },
   "dependencies": {
     "bson": "^7.3.0"
