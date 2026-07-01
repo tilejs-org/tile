@@ -23,12 +23,7 @@ jobs:
         with:
           node-version: 20
 
-      - name: Get version from API
-        id: version
-        run: |
-          VERSION=$(curl -s https://api-tilejs.vercel.app/versions/root | jq -r '.version')
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-
+      # 🔥 PRIMEIRO: pega commit (independente da API)
       - name: Get last commit
         id: commit
         run: |
@@ -40,26 +35,44 @@ jobs:
           echo "author=$AUTHOR" >> $GITHUB_OUTPUT
           echo "hash=$HASH" >> $GITHUB_OUTPUT
 
+      # 🔥 SEGUNDO: espera API estar pronta (MUDOU A PRIORIDADE)
+      - name: Wait API ready
+        run: |
+          for i in {1..15}; do
+            VERSION=$(curl -s https://api-tilejs.vercel.app/versions/root | jq -r '.version')
+
+            if [ "$VERSION" != "null" ] && [ "$VERSION" != "" ]; then
+              echo "API ready: $VERSION"
+              exit 0
+            fi
+
+            echo "Waiting API..."
+            sleep 3
+          done
+
+          echo "API not ready"
+          exit 1
+
+      # 🔥 TERCEIRO: agora sim pega versão
+      - name: Get version from API
+        id: version
+        run: |
+          VERSION=$(curl -s https://api-tilejs.vercel.app/versions/root | jq -r '.version')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      # 🔥 QUARTO: gera exatamente seu release.md (NÃO ALTERADO)
       - name: Generate release body
         run: |
-          echo "# Tile.js v${{ steps.version.outputs.version }}" > release.md
-          echo "" >> release.md
-
-          echo "## 📝 Commit" >> release.md
           echo "${{ steps.commit.outputs.message }}" >> release.md
           echo "" >> release.md
 
-          echo "## 👤 Autor" >> release.md
-          echo "${{ steps.commit.outputs.author }}" >> release.md
+          echo "**Author:** ${{ steps.commit.outputs.author }}" >> release.md
           echo "" >> release.md
 
-          echo "## 🔖 Hash" >> release.md
-          echo "${{ steps.commit.outputs.hash }}" >> release.md
+          echo "**Hash:** ${{ steps.commit.outputs.hash }}" >> release.md
           echo "" >> release.md
 
-          echo "## 🔗 API" >> release.md
-          echo "https://api-tilejs.vercel.app/versions/root" >> release.md
-
+      # 🔥 QUINTO: cria release
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
