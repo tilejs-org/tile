@@ -23,7 +23,14 @@ jobs:
         with:
           node-version: 20
 
-      # 🔥 PRIMEIRO: pega commit (independente da API)
+      # 🔥 pega versão direto do package.json (SEM API)
+      - name: Get version from package.json
+        id: version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      # 🔥 pega último commit
       - name: Get last commit
         id: commit
         run: |
@@ -31,7 +38,7 @@ jobs:
           AUTHOR=$(git log -1 --pretty=%an)
           HASH=$(git rev-parse --short HEAD)
 
-          # EOF delimiter para valores multilinhas
+          # suporte a multiline safe
           echo "message<<EOF" >> $GITHUB_OUTPUT
           echo "$MESSAGE" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
@@ -39,44 +46,18 @@ jobs:
           echo "author=$AUTHOR" >> $GITHUB_OUTPUT
           echo "hash=$HASH" >> $GITHUB_OUTPUT
 
-      # 🔥 SEGUNDO: espera API estar pronta (MUDOU A PRIORIDADE)
-      - name: Wait API ready
-        run: |
-          for i in {1..15}; do
-            VERSION=$(curl -s https://api-tilejs.vercel.app/versions/root | jq -r '.version')
-
-            if [ "$VERSION" != "null" ] && [ "$VERSION" != "" ]; then
-              echo "API ready: $VERSION"
-              exit 0
-            fi
-
-            echo "Waiting API..."
-            sleep 3
-          done
-
-          echo "API not ready"
-          exit 1
-
-      # 🔥 TERCEIRO: agora sim pega versão
-      - name: Get version from API
-        id: version
-        run: |
-          VERSION=$(curl -s https://api-tilejs.vercel.app/versions/root | jq -r '.version')
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-
-      # 🔥 QUARTO: gera exatamente seu release.md (NÃO ALTERADO)
+      # 🔥 gera release body (SEM mudar sua estrutura)
       - name: Generate release body
         run: |
-          echo "${{ steps.commit.outputs.message }}" >> release.md
+          echo "${{ steps.commit.outputs.message }}" > release.md
           echo "" >> release.md
 
           echo "**Author:** ${{ steps.commit.outputs.author }}" >> release.md
           echo "" >> release.md
 
           echo "**Hash:** ${{ steps.commit.outputs.hash }}" >> release.md
-          echo "" >> release.md
 
-      # 🔥 QUINTO: cria release
+      # 🔥 cria release no GitHub
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
