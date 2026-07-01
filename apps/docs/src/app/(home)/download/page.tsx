@@ -4,9 +4,9 @@ import { useState } from "react";
 import { FaApple, FaLinux, FaWindows, FaRegCopy } from "react-icons/fa";
 
 const COMMANDS = {
-  macos: "curl -fsSL https://tile.js.org/install.sh | sh",
-  linux: "curl -fsSL https://tile.js.org/install.sh | sh",
-  windows: "irm https://tile.js.org/install.ps1 | iex",
+  macos: "curl -fsSL https://tile.js.org/installer/cli/install.sh | sh",
+  linux: "curl -fsSL https://tile.js.org/installer/cli/install.sh | sh",
+  windows: "irm https://tile.js.org/installer/cli/install.ps1 | iex",
 } as const;
 
 type Platform = keyof typeof COMMANDS;
@@ -67,7 +67,7 @@ export default function Page() {
         </button>
       </div>
 
-      <div className="mt-4 flex flex-wrap items-center justify-center gap-2 text-sm text-fd-muted-foreground">
+      {/*<div className="mt-4 flex flex-wrap items-center justify-center gap-2 text-sm text-fd-muted-foreground">
         <a
           href="https://tile.js.org/install.sh"
           target="_blank"
@@ -76,7 +76,7 @@ export default function Page() {
         >
           View install script
         </a>
-      </div>
+      </div>*/}
     </main>
   );
 }

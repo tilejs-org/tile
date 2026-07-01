@@ -23,14 +23,14 @@ jobs:
         with:
           node-version: 20
 
-      # pega versão direto do package.json
+      # pega versão do package.json
       - name: Get version
         id: version
         run: |
           VERSION=$(node -p "require('./package.json').version")
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-      # pega commit
+      # pega info do commit
       - name: Get commit info
         id: commit
         run: |
@@ -41,7 +41,44 @@ jobs:
           echo "author=$(git log -1 --pretty=%an)" >> $GITHUB_OUTPUT
           echo "hash=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
-      # monta release.md SEM quebrar o YAML
+      # (OPCIONAL) build CLI aqui
+      # - name: Build CLI
+      #   run: bun run build
+
+      # prepara assets
+      - name: Prepare release assets
+        run: |
+          set -e
+
+          VERSION="${{ steps.version.outputs.version }}"
+          OUT="release-assets"
+
+          mkdir -p $OUT
+
+          echo "📦 Copying installer files..."
+
+          # arquivos estáveis (latest)
+          cp installer/cli/install.sh $OUT/install.sh
+          cp installer/cli/install.ps1 $OUT/install.ps1
+
+          # versões específicas (opcional)
+          cp installer/cli/install.sh $OUT/install-v$VERSION.sh
+          cp installer/cli/install.ps1 $OUT/install-v$VERSION.ps1
+
+          # permissões
+          chmod +x $OUT/*.sh
+
+          # checksums SHA256
+          cd $OUT
+          sha256sum install.sh > install.sh.sha256
+          sha256sum install.ps1 > install.ps1.sha256
+          sha256sum install-v$VERSION.sh > install-v$VERSION.sh.sha256
+          sha256sum install-v$VERSION.ps1 > install-v$VERSION.ps1.sha256
+          cd ..
+
+          echo "✅ Assets ready"
+
+      # release notes
       - name: Generate release body
         run: |
           cat << 'EOF' > release.md
@@ -55,23 +92,44 @@ jobs:
             </p>
           </div>
 
+          ## 🚀 Release v${{ steps.version.outputs.version }}
+
           ${{ steps.commit.outputs.message }}
 
           **Author:** ${{ steps.commit.outputs.author }}
 
-          **Hash:** ${{ steps.commit.outputs.hash }}
+          **Commit:** ${{ steps.commit.outputs.hash }}
+
+          ---
+
+          ## 📦 Installation
+
+          ### Linux / macOS
+          ```bash
+          curl -fsSL https://github.com/tilejs-org/tile/releases/latest/download/install.sh | sh
+          ```
+
+          ### Windows (PowerShell)
+          ```powershell
+          irm https://github.com/tilejs-org/tile/releases/latest/download/install.ps1 | iex
+          ```
+
+          ---
+
+          ## 🔐 Integrity
+
+          Todos os arquivos possuem checksum SHA256 incluído nos assets.
+
+          ---
 
           ## Links
 
-          - Tile.JS [website](https://tile.js.org/) | [Documentation](https://tile.js.org/docs).
-          - [GitHub](https://github.com/tilejs-org/tile) monorep.
+          - Tile.JS [website](https://tile.js.org/)
+          - [Documentation](https://tile.js.org/docs)
+          - [GitHub](https://github.com/tilejs-org/tile)
 
           <p align="center">
-            <img src="https://raw.githubusercontent.com/catppuccin/catppuccin/main/assets/footers/gray0_ctp_on_line.svg?sanitize=true"></img>
-          </p>
-
-          <p align="center">
-            Copyright &copy; 2026, Israel R. Jatobá.
+            Copyright © 2026, Israel R. Jatobá.
           </p>
           EOF
 
@@ -82,3 +140,12 @@ jobs:
           tag_name: v${{ steps.version.outputs.version }}
           name: v${{ steps.version.outputs.version }}
           body_path: release.md
+          files: |
+            release-assets/install.sh
+            release-assets/install.ps1
+            release-assets/install.sh.sha256
+            release-assets/install.ps1.sha256
+            release-assets/install-v${{ steps.version.outputs.version }}.sh
+            release-assets/install-v${{ steps.version.outputs.version }}.ps1
+            release-assets/install-v${{ steps.version.outputs.version }}.sh.sha256
+            release-assets/install-v${{ steps.version.outputs.version }}.ps1.sha256
