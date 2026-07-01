@@ -1,0 +1,68 @@
+name: Auto Release (Main)
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Get version from API
+        id: version
+        run: |
+          VERSION=$(curl -s https://api-tilejs.vercel.app/versions/root | jq -r '.version')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Get last commit
+        id: commit
+        run: |
+          MESSAGE=$(git log -1 --pretty=%B)
+          AUTHOR=$(git log -1 --pretty=%an)
+          HASH=$(git rev-parse --short HEAD)
+
+          echo "message=$MESSAGE" >> $GITHUB_OUTPUT
+          echo "author=$AUTHOR" >> $GITHUB_OUTPUT
+          echo "hash=$HASH" >> $GITHUB_OUTPUT
+
+      - name: Generate release body
+        run: |
+          echo "# Tile.js v${{ steps.version.outputs.version }}" > release.md
+          echo "" >> release.md
+
+          echo "## 📝 Commit" >> release.md
+          echo "${{ steps.commit.outputs.message }}" >> release.md
+          echo "" >> release.md
+
+          echo "## 👤 Autor" >> release.md
+          echo "${{ steps.commit.outputs.author }}" >> release.md
+          echo "" >> release.md
+
+          echo "## 🔖 Hash" >> release.md
+          echo "${{ steps.commit.outputs.hash }}" >> release.md
+          echo "" >> release.md
+
+          echo "## 🔗 API" >> release.md
+          echo "https://api-tilejs.vercel.app/versions/root" >> release.md
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: v${{ steps.version.outputs.version }}
+          body_path: release.md
