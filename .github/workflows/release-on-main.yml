@@ -31,7 +31,11 @@ jobs:
           AUTHOR=$(git log -1 --pretty=%an)
           HASH=$(git rev-parse --short HEAD)
 
-          echo "message=$MESSAGE" >> $GITHUB_OUTPUT
+          # EOF delimiter para valores multilinhas
+          echo "message<<EOF" >> $GITHUB_OUTPUT
+          echo "$MESSAGE" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
           echo "author=$AUTHOR" >> $GITHUB_OUTPUT
           echo "hash=$HASH" >> $GITHUB_OUTPUT
 
