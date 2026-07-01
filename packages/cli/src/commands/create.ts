@@ -6,9 +6,8 @@ import {
   readFile,
   writeFile,
 } from "fs/promises";
-import { join } from "path";
 
-import { spawn } from "bun";
+import { spawn } from "node:child_process";
 
 import {
   cancel,
@@ -21,12 +20,18 @@ import chalk from "chalk";
 import consola from "consola";
 import ora from "ora";
 
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+
+
 import { createCommand } from "../core/command.js";
 
 const logger = consola.withTag("create");
 
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
 const TEMPLATE_DIR = join(
-  import.meta.dir,
+  __dirname,
   "../../templates/package",
 );
 
@@ -306,18 +311,21 @@ async function installDependencies(
   };
 
   const spinner = ora({
-    text: `Instalando dependências com ${manager}...\n`,
+    text: `Instalando dependências com ${manager}...`,
     spinner: "dots",
   }).start();
 
-  const proc = spawn({
-    cmd: commands[manager],
+  const [command, ...args] = commands[manager];
+
+  const proc = spawn(command, args, {
     cwd: targetDir,
-    stdout: "inherit",
-    stderr: "inherit",
+    stdio: "inherit",
   });
 
-  const code = await proc.exited;
+  const code = await new Promise<number>((resolve, reject) => {
+    proc.on("close", (code) => resolve(code ?? 1));
+    proc.on("error", reject);
+  });
 
   if (code === 0) {
     spinner.succeed("Dependências instaladas.");
@@ -444,7 +452,7 @@ export default createCommand({
       // case "version": {
       //   const pkg = JSON.parse(
       //     await readFile(
-      //       join(import.meta.dir, "../../package.json"),
+      //       join(__dirname, "../../package.json"),
       //       "utf8",
       //     ),
       //   );

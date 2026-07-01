@@ -1,6 +1,6 @@
 {
   "name": "@tile.js/cli",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "CLI oficial do TileJS",
   "type": "module",
   "bin": {
