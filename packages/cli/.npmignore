@@ -1,8 +1,5 @@
 /node_modules
-/playground
 /src
-/tests
-/build.ts
 /tsconfig.json
 package-lock.json
 

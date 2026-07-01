@@ -1,3 +1,21 @@
+crie os arquivos `.gitignore` e `.npmignore`.
+
+file: `.npmignore`:
+```.npmignore
+/node_modules
+/playground
+/src
+/tests
+/build.ts
+/tsconfig.json
+package-lock.json
+
+.env
+.env.*
+```
+
+file: `.gitignore`:
+```.gitignore
 # Dependencies
 node_modules
 
@@ -31,3 +49,4 @@ coverage
 
 # TypeScript
 *.tsbuildinfo
+``` 
