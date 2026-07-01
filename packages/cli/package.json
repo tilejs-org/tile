@@ -1,13 +1,14 @@
 {
   "name": "@tile.js/cli",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "CLI oficial do TileJS",
   "type": "module",
   "bin": {
     "tile": "dist/index.js"
   },
   "files": [
-    "dist"
+    "dist",
+    "templates"
   ],
   "main": "dist/index.js",
   "exports": {
