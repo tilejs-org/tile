@@ -106,12 +106,12 @@ jobs:
 
           ### Linux / macOS
           ```bash
-          curl -fsSL https://github.com/tilejs-org/tile/releases/latest/download/install.sh | sh
+          curl -fsSL https://github.com/tilejs-org/tile/releases/download/v${{ steps.version.outputs.version }}/install.sh | sh
           ```
 
           ### Windows (PowerShell)
           ```powershell
-          irm https://github.com/tilejs-org/tile/releases/latest/download/install.ps1 | iex
+          irm https://github.com/tilejs-org/tile/releases/download/v${{ steps.version.outputs.version }}/install.ps1 | iex
           ```
 
           ---
@@ -124,12 +124,15 @@ jobs:
 
           ## Links
 
-          - Tile.JS [website](https://tile.js.org/)
-          - [Documentation](https://tile.js.org/docs)
-          - [GitHub](https://github.com/tilejs-org/tile)
+          - Tile.JS [website](https://tile.js.org/) | [Documentation](https://tile.js.org/docs).
+          - [GitHub](https://github.com/tilejs-org/tile) monorep.
 
           <p align="center">
-            Copyright © 2026, Israel R. Jatobá.
+            <img src="https://raw.githubusercontent.com/catppuccin/catppuccin/main/assets/footers/gray0_ctp_on_line.svg?sanitize=true"></img>
+          </p>
+
+          <p align="center">
+            Copyright &copy; 2026, Israel R. Jatobá.
           </p>
           EOF
 
