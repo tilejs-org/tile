@@ -23,42 +23,71 @@ jobs:
         with:
           node-version: 20
 
-      # 🔥 pega versão direto do package.json (SEM API)
-      - name: Get version from package.json
+      # pega versão direto do package.json
+      - name: Get version
         id: version
         run: |
           VERSION=$(node -p "require('./package.json').version")
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-      # 🔥 pega último commit
-      - name: Get last commit
+      # pega commit
+      - name: Get commit info
         id: commit
         run: |
-          MESSAGE=$(git log -1 --pretty=%B)
-          AUTHOR=$(git log -1 --pretty=%an)
-          HASH=$(git rev-parse --short HEAD)
-
-          # suporte a multiline safe
           echo "message<<EOF" >> $GITHUB_OUTPUT
-          echo "$MESSAGE" >> $GITHUB_OUTPUT
+          git log -1 --pretty=%B >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
-          echo "author=$AUTHOR" >> $GITHUB_OUTPUT
-          echo "hash=$HASH" >> $GITHUB_OUTPUT
+          echo "author=$(git log -1 --pretty=%an)" >> $GITHUB_OUTPUT
+          echo "hash=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
-      # 🔥 gera release body (SEM mudar sua estrutura)
+      # monta release.md SEM quebrar o YAML
       - name: Generate release body
         run: |
-          echo "${{ steps.commit.outputs.message }}" > release.md
-          echo "" >> release.md
+          cat << 'EOF' > release.md
+          <div align="center">
+            <p>
+              <img src="https://img.shields.io/endpoint?url=https://api-tilejs.vercel.app/versions/badge/root&style=for-the-badge" />
+              <img src="https://img.shields.io/badge/Bun-1.x-black?style=for-the-badge&logo=bun" />
+              <img src="https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white" />
+              <img src="https://img.shields.io/github/stars/tilejs-org/tile?style=for-the-badge" />
+              <img src="https://img.shields.io/github/issues/tilejs-org/tile?style=for-the-badge" />
+            </p>
+          </div>
 
-          echo "**Author:** ${{ steps.commit.outputs.author }}" >> release.md
-          echo "" >> release.md
+          ---
 
-          echo "**Hash:** ${{ steps.commit.outputs.hash }}" >> release.md
+          ## 📝 Commit
+          ${{ steps.commit.outputs.message }}
 
-      # 🔥 cria release no GitHub
-      - name: Create GitHub Release
+          ## 👤 Author
+          ${{ steps.commit.outputs.author }}
+
+          ## 🔖 Hash
+          ${{ steps.commit.outputs.hash }}
+
+          ---
+
+          ## Links
+
+          - Tile.JS [website](https://tile.js.org/) | [Documentation](https://tile.js.org/docs).
+          - [GitHub](https://github.com/tilejs-org/tile) monorep.
+
+          <p align="center">
+            <img src="https://raw.githubusercontent.com/catppuccin/catppuccin/main/assets/footers/gray0_ctp_on_line.svg?sanitize=true"></img>
+          </p>
+
+          <p align="center">
+            Copyright &copy; 2026, Israel R. Jatobá.
+          </p>
+
+          <p align="center">
+          <img src="https://img.shields.io/github/license/tilejs-org/tile?style=for-the-badge" />
+          </p>
+          EOF
+
+      # cria release
+      - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ steps.version.outputs.version }}

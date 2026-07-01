@@ -1,16 +1,11 @@
 <div align="center">
-  <!-- <img src="../../assets/..." width="456" alt="Tile.JS"></img> -->
-  
   <p>
-  <!-- Tile.JS badges -->
-  
-<img src="https://img.shields.io/endpoint?url=https://api-tilejs.vercel.app/versions/badge/root&style=for-the-badge" />
-<img src="https://img.shields.io/badge/Bun-1.x-black?style=for-the-badge&logo=bun" />
-<img src="https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white" />
-<img src="https://img.shields.io/github/stars/tilejs-org/tile?style=for-the-badge" />
-<img src="https://img.shields.io/github/issues/tilejs-org/tile?style=for-the-badge" />
-
-</p>
+    <img src="https://img.shields.io/endpoint?url=https://api-tilejs.vercel.app/versions/badge/root&style=for-the-badge" />
+    <img src="https://img.shields.io/badge/Bun-1.x-black?style=for-the-badge&logo=bun" />
+    <img src="https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white" />
+    <img src="https://img.shields.io/github/stars/tilejs-org/tile?style=for-the-badge" />
+    <img src="https://img.shields.io/github/issues/tilejs-org/tile?style=for-the-badge" />
+ </p>
 </div>
 
 > [!note]
